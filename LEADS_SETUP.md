@@ -16,13 +16,26 @@
 ## Hosting: Vercel
 La web se publica en Vercel. El acceso por cuenta de Lovable no funciona fuera del hosting de Lovable, por eso el panel usa Supabase Auth.
 
-Variables de entorno en Vercel (Settings → Environment Variables). Nunca se guardan en el código ni se comparten por chat:
+## Base de datos: proyecto Supabase propio
+- Proyecto `supabase-norita-cloud` (id `tvbakqgmoqfiycbtetng`, ver `supabase/config.toml`), en la cuenta de Norita.
+- Lovable Cloud (`zhexocukwtgdkdxgkunz`) no se usa para la nueva configuración: no da acceso a la clave de servicio ni a conexiones externas, por lo que el formulario no podría guardar leads desde Vercel. Producción sigue apuntando a él hasta que se cambien sus variables, en un paso aparte.
+- No abrir el editor de Lovable: podría regenerar archivos que apunten a Lovable Cloud.
+
+### Aplicar migraciones
+1. Crear `.env.local` en la raíz del proyecto (Git lo ignora; nunca se sube ni se copia a Vercel) con una línea:
+   `DATABASE_MIGRATION_URL=<URI del Session pooler>?sslmode=require`
+   La URI está en Supabase → Connect → Session pooler. No usar el Transaction pooler. La contraseña es la de la base de datos (Project Settings → Database).
+2. Comprobar que Git lo ignora: `git check-ignore .env.local` debe mostrar el nombre del archivo.
+3. Ejecutar `npm run db:migrate`. Drizzle aplica en una sola transacción las migraciones de `drizzle/migrations` que falten, en el orden de `meta/_journal.json`, y las registra en `drizzle.__drizzle_migrations`. Si una falla, no se aplica ninguna. Volver a ejecutarlo no repite las ya aplicadas.
+4. Verificar que el historial tiene una fila por migración (0000–0003) y que los permisos son los esperados antes de conectar Vercel.
+
+Variables de entorno en Vercel (Settings → Environment Variables). Nunca se guardan en el código ni se comparten por chat. Para probar una rama sin afectar a Production, marcar solo "Preview" con esa rama y volver a desplegarla (las variables `VITE_` se fijan al compilar). `DATABASE_MIGRATION_URL` nunca va a Vercel:
 
 | Variable | Tipo | Uso |
 |---|---|---|
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | Pública (navegador) | Inicio de sesión del panel |
 | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | Servidor | Consultas del panel con la sesión del administrador |
-| `SUPABASE_SERVICE_ROLE_KEY` | **Secreta** | Guardar envíos del formulario y procesar la cola |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Secreta** (`sb_secret_…`) | Guardar envíos del formulario y procesar la cola. Crear una clave secreta propia por entorno para poder revocarla por separado |
 | `TURNSTILE_SECRET_KEY` | **Secreta** | Verificación antispam y clave del límite de envíos |
 | `CRON_SECRET` | **Secreta** | Protege `/api/integrations/run` (Vercel Cron la envía automáticamente) |
 | `INTEGRATIONS_MODE` | Servidor | Sin definir = modo prueba. Solo `live` envía datos reales |
@@ -36,7 +49,7 @@ La tarea programada de reintentos (`vite.config.ts`) se ejecuta una vez al día,
 4. Revisar el texto de consentimiento con el responsable legal. El formulario no se habilita hasta tener política, versión y clave pública; el servidor también exige la clave privada y verificación satisfactoria.
 
 ## Autorizar administradores
-1. En Supabase (Lovable Cloud → Users), **desactivar el registro público** y crear la cuenta de la persona con correo y contraseña. Solo se crean cuentas a mano.
+1. En Supabase → Authentication: **desactivar el registro público** (Sign In / Providers), comprobar que TOTP está activo (Multi-Factor) y crear la cuenta de la persona en Users con "Auto Confirm User", para que no se envíe ningún correo. Solo se crean cuentas a mano.
 2. La persona abre `/admin/leads`, inicia sesión y activa la verificación en dos pasos con una app de autenticación. Sin segundo factor, el servidor y la base de datos deniegan el acceso.
 3. Si no tiene permiso, el panel muestra el identificador de su cuenta. Añadir un registro explícito en `user_roles` con ese `user_id` y `role = admin`. No se autoriza por nombre o correo ni se concede acceso automáticamente.
 4. Verificar con esa cuenta un envío real, consulta, cambio de estado, nota, baja y recarga.
@@ -51,7 +64,7 @@ La tarea programada de reintentos (`vite.config.ts`) se ejecuta una vez al día,
 - **WhatsApp Business:** los botones abren WhatsApp; eso no registra una conversación ni crea un lead. La sincronización requiere un proveedor autorizado y webhooks verificados, aún pendientes.
 
 ## Antes de producción
-- Aplicar la migración `0003_vercel_admin_security_outbox` en la base de datos y confirmar que se aplicó.
+- Aplicar las migraciones 0000–0003 en el proyecto propio con `npm run db:migrate` y confirmar el historial.
 - Completar lo anterior y probar móvil y escritorio con datos de prueba identificables, eliminándolos al finalizar.
 - Comprobar acceso denegado anónimo y sin segundo factor, permisos del administrador, persistencia, duplicados, límite de envíos y fallos de envío.
 - Definir plazos de conservación y protocolo de derechos con el responsable legal. No se afirma cumplimiento normativo integral sin esta revisión.
@@ -60,4 +73,5 @@ La tarea programada de reintentos (`vite.config.ts`) se ejecuta una vez al día,
 - Validaciones, autorización, protecciones del formulario, cola de integraciones y cabeceras cubiertas por pruebas automatizadas (`npm test`).
 - Migraciones 0000–0003 aplicadas en un Postgres local con roles equivalentes a Supabase: anónimos sin acceso, administradores sin segundo factor denegados, sin borrado ni edición de consentimiento, auditoría, bajas, límite de envíos y cola verificados.
 - Compilación para Vercel verificada localmente, incluida la tarea programada.
-- **No verificado todavía** con la base de datos real ni en Vercel: falta aplicar la migración, configurar variables y crear la cuenta de administrador.
+- `drizzle-kit migrate` simulado localmente con el mismo controlador: aplica 0000–0003 en orden, registra 4 entradas y una segunda ejecución no repite nada.
+- **No verificado todavía** con la base de datos real ni en Vercel: falta aplicar las migraciones en el proyecto propio, configurar variables y crear la cuenta de administrador.

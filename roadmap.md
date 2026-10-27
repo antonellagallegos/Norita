@@ -9,7 +9,9 @@
 - [x] Acceso de administradores en Vercel con Supabase Auth y verificación en dos pasos.
 - [x] Auditoría, bajas comerciales, límite de envíos, cabeceras de seguridad y logs sin datos personales.
 - [x] Cola de integraciones con modo prueba y reintento programado.
-- [ ] Aplicar migración 0003 y configurar variables en Vercel.
+- [x] Preparar migraciones para el proyecto Supabase propio (`npm run db:migrate`).
+- [ ] Aplicar migraciones 0000–0003 en el proyecto propio y verificar historial y permisos.
+- [ ] Conectar la rama de prueba en Vercel (solo Preview) al proyecto propio.
 - [ ] Prueba de envío y persistencia de cambios por administrador: bloqueada por política, antispam y autorización.
 - [ ] Activar captación: pendiente de política de privacidad aprobada y protección antispam configurada.
 - [ ] Autorizar al administrador: crear su cuenta de Supabase y asignar el rol explícitamente.
