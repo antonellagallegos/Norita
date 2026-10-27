@@ -149,6 +149,11 @@ async function behaviour() {
   if (pre.phones > 0) { check("los teléfonos ficticios no existen en la base (si no, B no se ejecuta)", false, { coincidencias: pre.phones }); return; }
   try {
     await sql.begin(async (tx) => {
+      // If the connection drops (e.g. the pooler resets it), the server ends and rolls back this transaction
+      // instead of keeping it open with its locks; no single step may hang either.
+      await tx`set local idle_in_transaction_session_timeout = '30s'`;
+      await tx`set local statement_timeout = '30s'`;
+      await tx`set local lock_timeout = '10s'`;
       // One statement as an API role inside a savepoint; a denied operation rolls back only that savepoint.
       // current_user is asserted so a verdict never comes from the administrative connection's privileges.
       const as = async (role, claims, query, params = []) => {
