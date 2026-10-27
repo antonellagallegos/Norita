@@ -3,6 +3,8 @@
 ## Implementado
 - Se conserva la web existente y el número oficial de WhatsApp.
 - Formulario con validación compartida cliente/servidor, datos comerciales mínimos, consentimiento de atención separado del consentimiento comercial opcional.
+- Campos obligatorios: nombre completo, correo, WhatsApp (prefijo internacional + número, guardado en `leads.phone` como dígitos E.164 sin "+"; un código de país escrito por la persona no se duplica), país del adulto mayor (`leads.country`: solo `PE` o `CO`) y distrito o localidad (`leads.district`).
+- Cobertura de localidades (`src/lib/lead-fields.ts`), no exhaustiva por país: Perú = 43 distritos de la provincia de Lima + 7 del Callao; Colombia = 20 localidades de Bogotá D.C. Cualquier otro lugar se registra como «Otra ubicación (fuera de la cobertura actual)» para no perder la solicitud.
 - Tabla `leads`, tabla protegida `user_roles`, funciones de autorización y métricas. No contiene datos ficticios.
 - Panel `/admin/leads` con inicio de sesión de Supabase y verificación en dos pasos obligatoria, filtros, paginación, fichas, estados, notas, fechas y registro de bajas comerciales.
 - RLS y permisos: visitantes no pueden leer, actualizar, borrar ni insertar leads. Los administradores autorizados (rol explícito **y** segundo factor) pueden leer y actualizar solo los campos de seguimiento; no pueden borrar leads ni modificar los datos de contacto o la prueba de consentimiento.
@@ -44,8 +46,8 @@ La tarea programada de reintentos (`vite.config.ts`) se ejecuta una vez al día,
 
 ## Para habilitar la captación
 1. Compartir la política de privacidad aprobada y su versión, incluyendo el responsable, finalidades, conservación, destinatarios y ejercicio de derechos. La página actual informa de que todavía no está publicada; no constituye una política ni asesoramiento legal.
-2. Incorporar esa política o su enlace y versión en la configuración central `src/lib/contact-config.ts` (`PRIVACY_URL`, `PRIVACY_VERSION`).
-3. Crear un widget de Cloudflare Turnstile y autorizar los dominios de la web y de pruebas. Configurar `TURNSTILE_SITE_KEY` en la configuración pública y `TURNSTILE_SECRET_KEY` como variable secreta en Vercel.
+2. Configurar su enlace y versión como variables públicas por entorno en Vercel: `VITE_PRIVACY_URL` y `VITE_PRIVACY_VERSION` (leídas en `src/lib/contact-config.ts`). Sin ellas el formulario sigue desactivado en ese entorno.
+3. Crear un widget de Cloudflare Turnstile y autorizar los dominios de la web y de pruebas. Configurar `VITE_TURNSTILE_SITE_KEY` (pública) por entorno y `TURNSTILE_SECRET_KEY` como variable secreta en Vercel.
 4. Revisar el texto de consentimiento con el responsable legal. El formulario no se habilita hasta tener política, versión y clave pública; el servidor también exige la clave privada y verificación satisfactoria.
 
 ## Autorizar administradores
@@ -62,6 +64,8 @@ La tarea programada de reintentos (`vite.config.ts`) se ejecuta una vez al día,
 - **Notificaciones:** pendiente. Requiere un proveedor de email y un dominio de envío verificado. Un fallo de correo nunca revierte el lead.
 - **Calendly:** facilitar el enlace real para `CALENDLY_URL`. Hasta entonces se ofrece un mensaje de indisponibilidad y alternativas. El webhook y su verificación de firma deberán conectarse cuando existan credenciales reales. `external_booking_id`, `source` y `call_scheduled` están preparados. No se confirma ninguna reserva desde esta web.
 - **WhatsApp Business:** los botones abren WhatsApp; eso no registra una conversación ni crea un lead. La sincronización requiere un proveedor autorizado y webhooks verificados, aún pendientes.
+
+Para probar en una rama sin afectar a Production: crear `VITE_PRIVACY_URL`, `VITE_PRIVACY_VERSION`, `VITE_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY` solo para Preview y esa rama, y volver a desplegarla. El servidor usa `SUPABASE_SERVICE_ROLE_KEY` o, si no existe, `SUPABASE_SECRET_KEY` (nombre de la integración de Supabase en Vercel); debe ser la clave del mismo proyecto que `SUPABASE_URL`. Usar solo datos ficticios mientras la política no esté aprobada.
 
 ## Antes de producción
 - Aplicar las migraciones 0000–0003 en el proyecto propio con `npm run db:migrate` y confirmar el historial.

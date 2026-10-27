@@ -118,6 +118,7 @@ export type Database = {
           consent_contact: boolean
           consent_processing: boolean
           consent_timestamp: string | null
+          country: string | null
           created_at: string
           district: string | null
           duplicate_of: string | null
@@ -147,6 +148,7 @@ export type Database = {
           consent_contact?: boolean
           consent_processing: boolean
           consent_timestamp?: string | null
+          country?: string | null
           created_at?: string
           district?: string | null
           duplicate_of?: string | null
@@ -176,6 +178,7 @@ export type Database = {
           consent_contact?: boolean
           consent_processing?: boolean
           consent_timestamp?: string | null
+          country?: string | null
           created_at?: string
           district?: string | null
           duplicate_of?: string | null
