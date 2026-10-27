@@ -29,6 +29,13 @@
       "when": 1793100000000,
       "tag": "0003_vercel_admin_security_outbox",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793110000000,
+      "tag": "0004_restrict_authenticated_table_grants",
+      "breakpoints": true
     }
   ]
 }
