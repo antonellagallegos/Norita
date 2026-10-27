@@ -1,0 +1,10 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, MessageCircle } from "lucide-react";
+import { pageHead } from "@/lib/page-head";
+import { whatsappUrl } from "@/lib/brand";
+import { PRIVACY_URL } from "@/lib/contact-config";
+import { FloatingContact } from "@/components/floating-contact";
+
+export const Route = createFileRoute("/privacidad")({ head: () => pageHead("Privacidad y datos personales | Norita", "Información de disponibilidad de la política de privacidad de Norita y contacto para solicitudes sobre datos personales."), component: Privacy });
+function Privacy() { return <main className="mx-auto min-h-screen max-w-3xl px-5 py-12"><Button asChild variant="link" className="p-0"><Link to="/"><ArrowLeft /> Volver a Norita</Link></Button><h1 className="mt-10 text-3xl font-medium">Privacidad y datos personales</h1>{PRIVACY_URL ? <Button asChild className="mt-6"><a href={PRIVACY_URL} target="_blank" rel="noopener noreferrer">Consultar política de privacidad</a></Button> : <p className="mt-6 leading-relaxed text-muted-foreground">La política de privacidad de Norita aún no está publicada en esta web. El formulario no recoge solicitudes hasta que esté disponible.</p>}<h2 className="mt-10 text-xl">Solicitudes sobre tus datos</h2><p className="mt-4 leading-relaxed text-muted-foreground">Para solicitar acceso, rectificación, cancelación u oposición al tratamiento de tus datos, contacta con Norita. No envíes documentación médica por este canal.</p><Button asChild variant="outline" className="mt-6 h-12"><a href={whatsappUrl("Hola, quisiera gestionar una solicitud sobre mis datos personales (acceso, rectificación, cancelación u oposición).")} target="_blank" rel="noopener noreferrer"><MessageCircle /> Contactar con Norita</a></Button><FloatingContact /></main>; }
