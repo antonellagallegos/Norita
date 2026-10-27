@@ -44,12 +44,30 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+// Framing stays allowed on public pages so the Lovable editor preview keeps working;
+// private routes are never framed, cached or indexed.
+const PRIVATE_PATHS = ["/admin", "/api"];
+
+export function withSecurityHeaders(request: Request, response: Response): Response {
+  const secured = new Response(response.body, response);
+  secured.headers.set("X-Content-Type-Options", "nosniff");
+  secured.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  secured.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
+  const { pathname } = new URL(request.url);
+  if (PRIVATE_PATHS.some(p => pathname === p || pathname.startsWith(`${p}/`))) {
+    secured.headers.set("X-Frame-Options", "DENY");
+    secured.headers.set("Cache-Control", "no-store");
+    secured.headers.set("X-Robots-Tag", "noindex, nofollow");
+  }
+  return secured;
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      return withSecurityHeaders(request, await normalizeCatastrophicSsrResponse(response));
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {

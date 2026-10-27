@@ -20,8 +20,14 @@ export const leadSchema = z.object({
   submission_id: z.string().uuid(),
 }).strict();
 export type LeadInput = z.input<typeof leadSchema>;
+// Validation errors can end up in server logs; report field names only, never submitted values.
+export function parseWithoutValues<T extends z.ZodTypeAny>(schema: T, input: unknown): z.output<T> {
+  const parsed = schema.safeParse(input);
+  if (parsed.success) return parsed.data;
+  throw new Error(`Datos no válidos: ${[...new Set(parsed.error.issues.map(i => String(i.path[0] ?? "solicitud")))].join(", ")}`);
+}
 export const updateLeadSchema = z.object({ id: z.string().uuid(), status: z.enum(statusKeys), internal_notes: z.string().max(5000), last_contact_at: z.string().datetime().nullable(), next_follow_up_at: z.string().datetime().nullable() }).strict();
-export type Lead = { id: string; created_at: string; name: string; phone: string; email: string | null; service_interest: string; district: string | null; frequency: string | null; preferred_contact: string; message: string | null; source: string; status: keyof typeof STATUSES; consent_contact: boolean; consent_timestamp: string | null; consent_processing: boolean; processing_timestamp: string | null; privacy_version: string | null; last_contact_at: string | null; next_follow_up_at: string | null; internal_notes: string; duplicate_of: string | null };
+export type Lead = { id: string; created_at: string; name: string; phone: string; email: string | null; service_interest: string; district: string | null; frequency: string | null; preferred_contact: string; message: string | null; source: string; status: keyof typeof STATUSES; consent_contact: boolean; consent_timestamp: string | null; consent_processing: boolean; processing_timestamp: string | null; privacy_version: string | null; last_contact_at: string | null; next_follow_up_at: string | null; internal_notes: string; duplicate_of: string | null; commercial_opt_out_at: string | null; commercial_opt_out_source: string | null };
 export const whatsappContactUrl = (phone: string) => {
   const parsed = phoneSchema.safeParse(phone);
   if (!parsed.success) return undefined;

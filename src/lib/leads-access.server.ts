@@ -1,15 +1,17 @@
 import { createClient } from "@supabase/supabase-js";
 import { getRequest } from "@tanstack/react-start/server";
-import { getSessionUser } from "@/lib/auth.server";
 import type { Database } from "@/integrations/supabase/types";
 
-export async function resolveLeadAccess() {
-  const user = await getSessionUser();
-  if (!user) return { user: null, client: null };
-  const token = getRequest().headers.get("x-lovable-identity-token");
+export type AdminUser = { userId: string; email: string | null; mfa: boolean };
+
+// Admins sign in with Supabase Auth; the browser attaches the session as a bearer token
+// (see auth-attacher). Queries run with that token, so RLS enforces the same rules again.
+export async function resolveLeadAccess(): Promise<{ user: AdminUser | null; client: ReturnType<typeof createClient<Database>> | null }> {
+  const token = /^Bearer (\S+)$/.exec(getRequest()?.headers.get("authorization") ?? "")?.[1];
+  if (!token) return { user: null, client: null };
   const url = process.env["SUPABASE_URL"];
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
-  if (!token || !url || !key) throw new Error("No se pudo comprobar el acceso. Inténtalo nuevamente.");
+  if (!url || !key) throw new Error("No se pudo comprobar el acceso. Inténtalo nuevamente.");
   const client = createClient<Database>(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
     global: { headers: { Authorization: `Bearer ${token}` }, fetch: (input, init) => {
@@ -18,9 +20,14 @@ export async function resolveLeadAccess() {
       return fetch(input, { ...init, headers });
     } },
   });
-  const { data, error } = await client.rpc("is_lead_admin");
-  if (error) throw new Error("No se pudo comprobar tu autorización.");
-  return { user, client: data === true ? client : null };
+  const { data, error } = await client.auth.getClaims(token);
+  if (error || !data?.claims?.sub) return { user: null, client: null };
+  const user = { userId: data.claims.sub, email: typeof data.claims.email === "string" ? data.claims.email : null, mfa: data.claims.aal === "aal2" };
+  // Without the second factor the database denies access anyway; skip the query.
+  if (!user.mfa) return { user, client: null };
+  const admin = await client.rpc("is_lead_admin");
+  if (admin.error) throw new Error("No se pudo comprobar tu autorización.");
+  return { user, client: admin.data === true ? client : null };
 }
 
 export async function requireLeadAdmin() {

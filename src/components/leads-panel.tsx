@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { listLeads, updateLead } from "@/lib/leads.functions";
+import { listLeads, recordCommercialOptOut, updateLead } from "@/lib/leads.functions";
 import { SERVICES, STATUSES, statusKeys, whatsappContactUrl, type Lead } from "@/lib/leads";
 
 const date = (value: string | null) => value ? new Date(value).toLocaleString("es-PE", { dateStyle: "short", timeStyle: "short", timeZone: "America/Lima" }) : "—";
@@ -16,6 +16,8 @@ const iso = (value: string) => value ? new Date(value).toISOString() : null;
 
 function LeadDetail({ lead, onSaved, onClose }: { lead: Lead; onSaved: () => void; onClose: () => void }) {
   const save = useServerFn(updateLead);
+  const optOut = useServerFn(recordCommercialOptOut);
+  const [optedOutAt, setOptedOutAt] = useState(lead.commercial_opt_out_at);
   const [status, setStatus] = useState(lead.status);
   const [notes, setNotes] = useState(lead.internal_notes);
   const [last, setLast] = useState(localDateInput(lead.last_contact_at));
@@ -25,7 +27,8 @@ function LeadDetail({ lead, onSaved, onClose }: { lead: Lead; onSaved: () => voi
     <dl className="grid grid-cols-2 gap-4 text-sm">{[["Teléfono", lead.phone], ["Distrito", lead.district], ["Correo", lead.email], ["Origen", lead.source], ["Frecuencia", lead.frequency], ["Contacto preferido", lead.preferred_contact]].map(([label,value]) => <div key={label}><dt className="text-muted-foreground">{label}</dt><dd className="mt-1 break-words font-medium">{value || "—"}</dd></div>)}</dl>
     {lead.message && <div className="border-y border-border py-4"><p className="text-sm text-muted-foreground">Consulta</p><p className="mt-2 whitespace-pre-wrap break-words text-sm">{lead.message}</p></div>}
     {lead.duplicate_of && <p className="text-sm text-accent">Posible consulta duplicada. Se conserva la solicitud anterior.</p>}
-    <p className="text-xs leading-relaxed text-muted-foreground">Tratamiento de la solicitud: {date(lead.processing_timestamp)} · Política: {lead.privacy_version || "—"}<br />Contacto comercial: {lead.consent_contact ? `Autorizado · ${date(lead.consent_timestamp)}` : "No autorizado"}</p>
+    <p className="text-xs leading-relaxed text-muted-foreground">Tratamiento de la solicitud: {date(lead.processing_timestamp)} · Política: {lead.privacy_version || "—"}<br />Contacto comercial: {optedOutAt ? `Baja registrada · ${date(optedOutAt)}` : lead.consent_contact ? `Autorizado · ${date(lead.consent_timestamp)}` : "No autorizado"}</p>
+    {lead.consent_contact && !optedOutAt && <Button type="button" variant="outline" disabled={busy} className="h-auto min-h-10 whitespace-normal" onClick={async () => { if (!window.confirm("Se dejarán de enviar comunicaciones comerciales a este teléfono, también en sus otras consultas. Esta acción no se puede deshacer desde el panel.")) return; setBusy(true); setError(""); try { await optOut({ data: { id: lead.id } }); setOptedOutAt(new Date().toISOString()); onSaved(); } catch { setError("No pudimos registrar la baja. Inténtalo nuevamente."); } finally { setBusy(false); } }}>Registrar baja de comunicaciones comerciales</Button>}
     <form onSubmit={async e => { e.preventDefault(); setBusy(true); setError(""); try { await save({ data: { id: lead.id, status, internal_notes: notes, last_contact_at: iso(last), next_follow_up_at: iso(next) } }); onSaved(); onClose(); } catch { setError("No pudimos guardar los cambios. Inténtalo nuevamente."); } finally { setBusy(false); } }} className="space-y-5">
       <div><label htmlFor="lead-status" className="text-sm font-medium">Estado comercial</label><Select value={status} onValueChange={v => { if (statusKeys.includes(v as Lead["status"])) setStatus(v as Lead["status"]); }}><SelectTrigger id="lead-status" className="mt-2 h-12"><SelectValue /></SelectTrigger><SelectContent>{statusKeys.map(s => <SelectItem key={s} value={s}>{STATUSES[s]}</SelectItem>)}</SelectContent></Select></div>
       <label className="block text-sm font-medium">Notas internas<Textarea value={notes} onChange={e => setNotes(e.target.value)} maxLength={5000} className="mt-2 min-h-28" placeholder="Solo información comercial; no incluyas datos médicos." /></label>

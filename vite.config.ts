@@ -12,4 +12,10 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Only used by Vercel builds (Lovable builds for Cloudflare). Retries pending integration
+  // jobs once a day, the most Vercel Hobby allows; on Pro it can run every 10 minutes.
+  // Forwarded to Nitro unchanged; the wrapper's type only lists the Cloudflare options.
+  nitro: {
+    vercel: { config: { crons: [{ path: "/api/integrations/run", schedule: "0 13 * * *" }] } },
+  } as { preset?: string },
 });
