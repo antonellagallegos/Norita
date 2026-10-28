@@ -43,6 +43,13 @@
       "when": 1793120000000,
       "tag": "0005_lead_country_and_email_check",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793130000000,
+      "tag": "0006_add_medication_pickup_and_weekend_services",
+      "breakpoints": true
     }
   ]
 }

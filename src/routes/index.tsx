@@ -13,6 +13,7 @@ import citas from "@/assets/citas.jpg";
 import mente from "@/assets/mente.jpg";
 import fuerza from "@/assets/fuerza.jpg";
 import vida from "@/assets/vida.jpg";
+import paseo from "@/assets/hero.jpg";
 
 const TITLE = "Norita | Acompañamiento y bienestar para adultos mayores en Lima";
 const DESC =
@@ -65,19 +66,30 @@ const nav = [
 
 const services = [
   {
-    img: citas, title: "Acompañamiento a citas médicas",
+    img: citas, title: "Acompañamiento a citas médicas", service: SERVICES[0],
     desc: "Que tus padres no tengan que ir solos. Les acompañamos a sus consultas médicas con atención, paciencia y responsabilidad, manteniéndote informado sobre el acompañamiento realizado.",
     items: ["Acompañamiento durante la cita.", "Apoyo y orientación logística durante la visita.", "Comunicación con la familia según lo acordado."],
   },
   {
-    img: mente, title: "Neuroestimulación — Gimnasio Mental",
+    img: mente, title: "Neuroestimulación — Gimnasio Mental", service: SERVICES[1],
     desc: "Un espacio para mantener la mente activa, aprender y disfrutar. Sesiones de estimulación cognitiva con actividades adaptadas a los intereses y capacidades de cada adulto mayor.",
     items: ["Ejercicios de memoria y atención.", "Actividades de lenguaje y razonamiento.", "Juegos, retos y actividades significativas."],
   },
   {
-    img: fuerza, title: "Entrenamiento de fuerza",
+    img: fuerza, title: "Entrenamiento de fuerza", service: SERVICES[2],
     desc: "Seguir moviéndose también es una forma de cuidarse. Sesiones adaptadas para trabajar fuerza, equilibrio, movilidad y autonomía en la vida cotidiana, con evaluación previa.",
     items: ["Ejercicios adaptados a la capacidad individual.", "Trabajo de fuerza y movilidad funcional.", "Atención a la seguridad y progresión del entrenamiento."],
+  },
+  {
+    // Placeholder photo until a dedicated one is available.
+    img: family, title: "Recogida de medicamentos", service: SERVICES[3],
+    desc: "Para que tus padres no tengan que hacer filas ni desplazamientos. Recogemos sus medicamentos en la farmacia o el centro de salud y se los llevamos a casa. No administramos medicamentos ni modificamos tratamientos.",
+    items: ["Recogida en la farmacia o el centro de salud.", "Entrega en casa en el horario acordado.", "Aviso a la familia cuando se completa la entrega."],
+  },
+  {
+    img: paseo, imgPosition: "object-[50%_20%]", title: "Acompañamiento fines de semana", service: SERVICES[4],
+    desc: "Cuando la rutina cambia y la familia necesita apoyo, acompañamos a tus padres durante el fin de semana con compañía, conversación y actividades a su ritmo.",
+    items: ["Compañía en casa o en paseos cercanos.", "Actividades y conversación según sus intereses.", "Comunicación con la familia según lo acordado."],
   },
 ];
 
@@ -175,13 +187,13 @@ function Index() {
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-widest text-accent">Servicios</p>
-              <h2 className="mt-3 text-3xl font-medium leading-tight md:text-4xl">Tres formas de cuidar mejor.</h2>
+              <h2 className="mt-3 text-3xl font-medium leading-tight md:text-4xl">Cinco formas de cuidar mejor.</h2>
             </div>
             <div className="mt-14 grid gap-8 md:grid-cols-3">
-              {services.map((s, serviceIndex) => (
+              {services.map((s) => (
                 <article key={s.title} className="service-item group flex min-w-0 flex-col">
                   <div className="overflow-hidden rounded-md">
-                    <img src={s.img} alt={s.title} loading="lazy" width={1024} height={768} className="aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <img src={s.img} alt={s.title} loading="lazy" width={1024} height={768} className={`aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-105 ${s.imgPosition ?? ""}`} />
                   </div>
                   <div className="flex flex-1 flex-col pt-6">
                     <h3 className="text-xl font-semibold leading-snug">{s.title}</h3>
@@ -194,7 +206,7 @@ function Index() {
                       ))}
                     </ul>
                     <div className="mt-auto pt-7">
-                      <InformationButton service={SERVICES[serviceIndex] ?? ""} variant="link" />
+                      <InformationButton service={s.service} variant="link" />
                     </div>
                   </div>
                 </article>

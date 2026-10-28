@@ -7,7 +7,7 @@ const valid = { name: "Persona de prueba", email: "prueba@example.com", phone_pr
 describe("Lead capture rules", () => {
   it("requires name", () => { expect(leadSchema.safeParse({ ...valid, name: "" }).success).toBe(false); });
   it("requires phone", () => { expect(leadSchema.safeParse({ ...valid, phone: "" }).success).toBe(false); });
-  it("requires one of the four services", () => { expect(leadSchema.safeParse({ ...valid, service_interest: "Otro" }).success).toBe(false); expect(SERVICES).toHaveLength(4); });
+  it("requires one of the listed services", () => { expect(leadSchema.safeParse({ ...valid, service_interest: "Otro" }).success).toBe(false); expect(SERVICES).toHaveLength(6); for (const s of ["Recogida de medicamentos", "Acompañamiento fines de semana"]) expect(leadSchema.safeParse({ ...valid, service_interest: s }).success).toBe(true); });
   it("accepts a request without commercial consent", () => { const result = leadSchema.parse(valid); expect(result.consent_contact).toBe(false); });
   it("requires consent to process the inquiry separately", () => { expect(leadSchema.safeParse({ ...valid, consent_processing: false, consent_contact: true }).success).toBe(false); });
   it("rejects injected medical fields", () => { expect(leadSchema.safeParse({ ...valid, diagnosis: "private" }).success).toBe(false); });

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { LEAD_COUNTRIES, PHONE_PREFIX_KEYS, isValidLocality, normalizePhone } from "@/lib/lead-fields";
 
-export const SERVICES = ["Acompañamiento a citas médicas", "Neuroestimulación / Gimnasio Mental", "Entrenamiento de fuerza", "Quiero conocer varios servicios"] as const;
+export const SERVICES = ["Acompañamiento a citas médicas", "Neuroestimulación / Gimnasio Mental", "Entrenamiento de fuerza", "Recogida de medicamentos", "Acompañamiento fines de semana", "Quiero conocer varios servicios"] as const;
 export const STATUSES = { new: "Nuevo lead", contacted: "Contactado", conversation_started: "Conversación iniciada", call_scheduled: "Llamada agendada", proposal_sent: "Propuesta enviada", converted: "Cliente", not_converted: "No concretado" } as const;
 export const statusKeys = ["new", "contacted", "conversation_started", "call_scheduled", "proposal_sent", "converted", "not_converted"] as const;
 export const FREQUENCIES = ["Servicio puntual", "Servicio recurrente", "Todavía estoy evaluando"] as const;
