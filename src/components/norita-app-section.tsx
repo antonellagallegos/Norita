@@ -1,6 +1,6 @@
 import { ArrowRight, BrainCircuit, ClipboardList, Heart, History, UsersRound } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { whatsappUrl } from "@/lib/brand";
 
 const features = [
   { icon: History, title: "Historial médico en un solo lugar", description: "Guardamos el historial médico del adulto mayor en nuestra plataforma para mantener la información de su cuidado organizada." },
@@ -24,7 +24,7 @@ export function NoritaAppSection() {
               </div>
             ))}
           </div>
-          <Button asChild variant="link" className="mt-8 h-auto max-w-full justify-start whitespace-normal p-0 text-base text-primary"><a href={whatsappUrl("Hola, quisiera conocer la app de Norita y cómo puedo seguir el historial médico y los avances de mi familiar.")} target="_blank" rel="noopener noreferrer">Conocer la app de Norita <ArrowRight className="h-4 w-4 shrink-0" /></a></Button>
+          <Button asChild variant="link" className="mt-8 h-auto max-w-full justify-start whitespace-normal p-0 text-base text-primary"><Link to="/contacto">Solicitar información <ArrowRight className="h-4 w-4 shrink-0" /></Link></Button>
         </div>
         <div className="min-w-0 bg-secondary/60 px-5 py-8 sm:px-10 sm:py-12">
           <div role="img" aria-label="Vista ilustrativa de la app Norita con historial médico, registro de avances y seguimiento familiar" className="mx-auto max-w-sm overflow-hidden rounded-md border border-border bg-background shadow-soft">

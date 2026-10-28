@@ -1,13 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowRight, Heart, UserRound, ShieldCheck, Sprout, MessageCircle, Check, Menu, X } from "lucide-react";
+import { ArrowRight, Heart, UserRound, ShieldCheck, Sprout, Check, Menu, X } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { BRAND, whatsappUrl } from "@/lib/brand";
+import { BRAND } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
 import { NoritaAppSection } from "@/components/norita-app-section";
 import { InformationButton, ScheduleCall } from "@/components/contact-options";
 import { SERVICES } from "@/lib/leads";
-import { SERVICE_MESSAGES } from "@/lib/contact-config";
 import hero from "@/assets/norita-care.jpg";
 import family from "@/assets/family.jpg";
 import citas from "@/assets/citas.jpg";
@@ -38,11 +37,12 @@ const btn =
 const btnPrimary = `${btn} bg-primary text-primary-foreground shadow-none hover:bg-primary/90`;
 const btnGhost = `${btn} border border-primary/25 bg-background text-primary shadow-none hover:bg-secondary`;
 
-function WaButton({ label = "Conversemos por WhatsApp", msg, className = btnPrimary }: { label?: string; msg?: string; className?: string }) {
+// Every information CTA leads to the contact form; WhatsApp contact will be configured later.
+function RequestInfoButton({ className = btnPrimary }: { className?: string }) {
   return (
-    <Button asChild className={className}><a href={whatsappUrl(msg)} target="_blank" rel="noopener noreferrer">
-      <MessageCircle className="h-5 w-5" /> {label}
-    </a></Button>
+    <Button asChild className={className}><Link to="/contacto">
+      Solicitar información <ArrowRight className="h-4 w-4" />
+    </Link></Button>
   );
 }
 
@@ -65,17 +65,17 @@ const nav = [
 
 const services = [
   {
-    img: citas, title: "Acompañamiento a citas médicas", cta: "Consultar acompañamiento",
+    img: citas, title: "Acompañamiento a citas médicas",
     desc: "Que tus padres no tengan que ir solos. Les acompañamos a sus consultas médicas con atención, paciencia y responsabilidad, manteniéndote informado sobre el acompañamiento realizado.",
     items: ["Acompañamiento durante la cita.", "Apoyo y orientación logística durante la visita.", "Comunicación con la familia según lo acordado."],
   },
   {
-    img: mente, title: "Neuroestimulación — Gimnasio Mental", cta: "Conocer el gimnasio mental",
+    img: mente, title: "Neuroestimulación — Gimnasio Mental",
     desc: "Un espacio para mantener la mente activa, aprender y disfrutar. Sesiones de estimulación cognitiva con actividades adaptadas a los intereses y capacidades de cada adulto mayor.",
     items: ["Ejercicios de memoria y atención.", "Actividades de lenguaje y razonamiento.", "Juegos, retos y actividades significativas."],
   },
   {
-    img: fuerza, title: "Entrenamiento de fuerza", cta: "Consultar entrenamiento",
+    img: fuerza, title: "Entrenamiento de fuerza",
     desc: "Seguir moviéndose también es una forma de cuidarse. Sesiones adaptadas para trabajar fuerza, equilibrio, movilidad y autonomía en la vida cotidiana, con evaluación previa.",
     items: ["Ejercicios adaptados a la capacidad individual.", "Trabajo de fuerza y movilidad funcional.", "Atención a la seguridad y progresión del entrenamiento."],
   },
@@ -95,14 +95,14 @@ const steps = [
 ];
 
 const faqs = [
-  ["¿En qué distritos de Lima atiende Norita?", "Atendemos en Lima. La cobertura por distrito puede variar según el servicio; escríbenos por WhatsApp y te confirmamos si llegamos a tu zona."],
-  ["¿Cómo puedo solicitar un acompañamiento a una cita médica?", "Escríbenos por WhatsApp con la fecha, hora y lugar de la cita. Coordinamos contigo los detalles y las necesidades particulares de tu padre o madre."],
-  ["¿Puedo contratar una sola sesión o necesito un paquete?", "Las modalidades disponibles y sus condiciones te las explicamos por WhatsApp, según el servicio que te interese."],
+  ["¿En qué distritos de Lima atiende Norita?", "Atendemos en Lima. La cobertura por distrito puede variar según el servicio; solicita información y te confirmamos si llegamos a tu zona."],
+  ["¿Cómo puedo solicitar un acompañamiento a una cita médica?", "Solicita información indicando este servicio. Te contactamos para coordinar la fecha, hora y lugar de la cita, los detalles y las necesidades particulares de tu padre o madre."],
+  ["¿Puedo contratar una sola sesión o necesito un paquete?", "Las modalidades disponibles y sus condiciones te las explicamos cuando te contactemos, según el servicio que te interese."],
   ["¿Las sesiones se realizan en casa?", "La modalidad de cada servicio se coordina contigo. Escríbenos y te contamos las opciones disponibles para tu caso."],
   ["¿Cómo se personalizan las sesiones de gimnasio mental?", "Antes de empezar conocemos los intereses, rutinas y capacidades de la persona, y adaptamos las actividades a ella."],
-  ["¿Quién realiza el entrenamiento de fuerza?", "Las sesiones las realizan profesionales cualificados, con una evaluación previa. Puedes consultarnos por WhatsApp sobre su formación."],
+  ["¿Quién realiza el entrenamiento de fuerza?", "Las sesiones las realizan profesionales cualificados, con una evaluación previa. Puedes preguntarnos por su formación cuando te contactemos."],
   ["¿Cómo se mantiene informada a la familia?", "Acordamos contigo desde el inicio qué información quieres recibir y por qué medio, y la compartimos después de cada servicio."],
-  ["¿Qué información necesitan para comenzar?", "Datos básicos de tu padre o madre, el servicio que te interesa y cualquier necesidad particular. Te guiamos paso a paso por WhatsApp."],
+  ["¿Qué información necesitan para comenzar?", "Datos básicos de tu padre o madre, el servicio que te interesa y cualquier necesidad particular. Te guiamos paso a paso después de tu solicitud."],
 ];
 
 function Index() {
@@ -119,8 +119,7 @@ function Index() {
             ))}
           </nav>
           <div className="flex shrink-0 items-center gap-2">
-            <WaButton label="Conversemos" className={`${btnPrimary} hidden h-10 px-4 sm:inline-flex`} />
-            <Button asChild size="icon" variant="outline" className="h-11 w-11 border-border text-primary sm:hidden"><a href={whatsappUrl()} target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp"><MessageCircle /></a></Button>
+            <RequestInfoButton className={`${btnPrimary} hidden h-10 px-4 sm:inline-flex`} />
             <Button variant="ghost" size="icon" className="h-11 w-11 text-primary md:hidden" aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</Button>
           </div>
         </div>
@@ -140,10 +139,9 @@ function Index() {
               <h2 className="mt-4 max-w-md text-[1.75rem] font-medium leading-tight sm:mt-5 sm:text-3xl md:text-4xl">Cuidado cercano.<br />Tranquilidad para tu familia.</h2>
               <p className="mt-6 max-w-sm text-base leading-relaxed text-muted-foreground">Acompañamos a tus padres, cuidamos su mente y fortalecemos su autonomía. Con respeto, atención y calidez.</p>
               <div className="hero-actions mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-1 sm:mt-8 sm:flex sm:gap-3">
-                <WaButton label="Hablar con Norita" />
+                <RequestInfoButton />
                 <Button variant="ghost" asChild className="h-12 px-3 text-primary"><a href="#servicios">Ver servicios <ArrowRight /></a></Button>
               </div>
-              <div className="mt-3"><InformationButton label="Solicitar información" variant="link" /></div>
             </div>
           </div>
         </section>
@@ -196,10 +194,7 @@ function Index() {
                       ))}
                     </ul>
                     <div className="mt-auto pt-7">
-                      <Button variant="link" asChild className="h-auto justify-start whitespace-normal p-0 text-sm text-primary"><a href={whatsappUrl(SERVICE_MESSAGES[serviceIndex])} target="_blank" rel="noopener noreferrer">
-                        {s.cta} <ArrowRight className="h-4 w-4" />
-                      </a></Button>
-                      <div className="mt-4"><InformationButton service={SERVICES[serviceIndex] ?? ""} variant="link" /></div>
+                      <InformationButton service={SERVICES[serviceIndex] ?? ""} variant="link" />
                     </div>
                   </div>
                 </article>
@@ -240,7 +235,7 @@ function Index() {
                 </div>
               ))}
             </div>
-            <div className="mt-14"><WaButton label="Hablar con Norita" /></div>
+            <div className="mt-14"><RequestInfoButton /></div>
           </div>
         </section>
 
@@ -273,7 +268,7 @@ function Index() {
                 </AccordionItem>
               ))}
             </Accordion>
-            <div className="mt-8"><WaButton label="Consultar por WhatsApp" className={btnGhost} /></div>
+            <div className="mt-8"><RequestInfoButton className={btnGhost} /></div>
           </div>
         </section>
 
@@ -284,8 +279,7 @@ function Index() {
               <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-accent">Conversemos</p>
               <h2 className="text-3xl font-medium leading-tight md:text-4xl">Tus padres merecen sentirse acompañados. Tú mereces estar tranquilo.</h2>
               <p className="mt-6 text-lg leading-relaxed text-foreground/80">Cuéntanos qué necesita tu familia y encontremos juntos la mejor forma de acompañarlos.</p>
-              <div className="mt-9"><WaButton /></div>
-              <div className="mt-4"><InformationButton label="Quiero conocer los servicios" /></div>
+              <div className="mt-9"><RequestInfoButton /></div>
               <div className="mt-5"><ScheduleCall /></div>
               <p className="mt-4 text-sm text-foreground/70">Estamos aquí para escucharte.</p>
             </div>
@@ -309,7 +303,7 @@ function Index() {
           <div>
             <h3 className="text-base font-semibold">Contacto</h3>
             <div className="mt-4 space-y-3 text-muted-foreground">
-              <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 font-medium text-primary hover:underline"><MessageCircle className="h-4 w-4" /> Escríbenos por WhatsApp</a>
+              <Link to="/contacto" className="flex items-center gap-2 font-medium text-primary hover:underline">Solicitar información <ArrowRight className="h-4 w-4" /></Link>
               {BRAND.email && <a href={`mailto:${BRAND.email}`} className="block hover:text-primary">{BRAND.email}</a>}
               <a href="/privacidad" className="block text-sm hover:text-primary">Política de privacidad</a>
             </div>
@@ -318,10 +312,6 @@ function Index() {
         <p className="border-t border-border py-6 text-center text-sm text-muted-foreground">© {new Date().getFullYear()} Norita · {BRAND.coverage}</p>
       </footer>
 
-      {/* WhatsApp flotante */}
-      <Button asChild size="icon" className="floating-contact fixed bottom-5 right-5 z-30 h-12 w-12 rounded-full bg-whatsapp text-primary-foreground shadow-soft hover:bg-whatsapp/90"><a href={whatsappUrl()} target="_blank" rel="noopener noreferrer" aria-label="Escríbenos por WhatsApp">
-        <MessageCircle className="h-7 w-7" />
-      </a></Button>
     </div>
   );
 }

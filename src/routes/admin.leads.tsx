@@ -7,12 +7,11 @@ import { AdminGate } from "@/components/admin-auth";
 import { LeadsPanel } from "@/components/leads-panel";
 import { getLeadAccess } from "@/lib/leads.functions";
 import { pageHead } from "@/lib/page-head";
-import { FloatingContact } from "@/components/floating-contact";
 
 // The admin session lives in the browser, so this page renders on the client only.
 export const Route = createFileRoute("/admin/leads")({ ssr: false, head: () => ({ ...pageHead("Gestión privada de contactos | Norita", "Panel privado del equipo autorizado de Norita para gestionar consultas y seguimiento comercial."), meta: [...pageHead("Gestión privada de contactos | Norita", "Panel privado del equipo autorizado de Norita para gestionar consultas y seguimiento comercial.").meta, { name: "robots", content: "noindex, nofollow" }] }), component: AdminLeads });
 function AdminLeads() {
-  return <main className="mx-auto min-h-screen max-w-7xl px-5 py-8 md:px-8"><div className="mb-8 flex items-center justify-between"><span className="font-display text-2xl font-semibold text-primary">norita<span className="text-accent">+</span></span><Button variant="link" asChild><Link to="/"><ArrowLeft />Volver a la web</Link></Button></div><AdminGate><AuthorizedArea /></AdminGate><FloatingContact /></main>;
+  return <main className="mx-auto min-h-screen max-w-7xl px-5 py-8 md:px-8"><div className="mb-8 flex items-center justify-between"><span className="font-display text-2xl font-semibold text-primary">norita<span className="text-accent">+</span></span><Button variant="link" asChild><Link to="/"><ArrowLeft />Volver a la web</Link></Button></div><AdminGate><AuthorizedArea /></AdminGate></main>;
 }
 function AuthorizedArea() {
   const fetchAccess = useServerFn(getLeadAccess);

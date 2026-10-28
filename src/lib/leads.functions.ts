@@ -4,7 +4,7 @@ import { leadSchema, parseWithoutValues, updateLeadSchema, type Lead } from "@/l
 import { captureReady, PRIVACY_VERSION } from "@/lib/contact-config";
 
 export const submitLead = createServerFn({ method: "POST" }).inputValidator((input: unknown) => parseWithoutValues(leadSchema, input)).handler(async ({ data }) => {
-  if (!captureReady) throw new Error("El formulario aún no está habilitado. Puedes contactarnos por WhatsApp.");
+  if (!captureReady) throw new Error("El formulario aún no está habilitado. Inténtalo más tarde.");
   if (data.website) throw new Error("No pudimos validar tu solicitud.");
   const secret = process.env["TURNSTILE_SECRET_KEY"];
   if (!secret || !data.captcha) throw new Error("Completa la verificación de seguridad.");
@@ -14,7 +14,7 @@ export const submitLead = createServerFn({ method: "POST" }).inputValidator((inp
   const request = getRequest();
   const allowed = await supabaseAdmin.rpc("register_lead_attempt", { p_client_hash: await rateLimitKey(clientAddress(request), secret) });
   if (allowed.error) throw new Error("No pudimos guardar tu solicitud. Inténtalo de nuevo.");
-  if (allowed.data !== true) throw new Error("Hemos recibido varias solicitudes desde tu conexión. Inténtalo más tarde o escríbenos por WhatsApp.");
+  if (allowed.data !== true) throw new Error("Hemos recibido varias solicitudes desde tu conexión. Inténtalo más tarde.");
   if (!await verifyTurnstile({ secret, token: data.captcha, submissionId: data.submission_id, hostname: new URL(request.url).hostname })) throw new Error("La verificación ha caducado. Inténtalo de nuevo.");
   // This public endpoint permits only a validated insert; never returns a lead or PII.
   const existing = await supabaseAdmin.from("leads").select("id").eq("submission_id", data.submission_id).maybeSingle();
@@ -31,7 +31,7 @@ export const submitLead = createServerFn({ method: "POST" }).inputValidator((inp
     duplicate_of: duplicate.data?.id ?? null, submission_id: data.submission_id,
     source: "website", status: "new",
   }).select("id").single();
-  if (error && error.code !== "23505") throw new Error("No pudimos guardar tu solicitud. Inténtalo de nuevo o escríbenos por WhatsApp.");
+  if (error && error.code !== "23505") throw new Error("No pudimos guardar tu solicitud. Inténtalo de nuevo en unos minutos.");
   // The lead is already saved; integrations are best effort here and retried by the scheduled job.
   if (inserted) {
     try {

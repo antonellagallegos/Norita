@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Send, MessageCircle } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,7 +10,6 @@ import { FREQUENCIES, SERVICES, leadSchema } from "@/lib/leads";
 import { LEAD_COUNTRIES, LOCALITIES, OTHER_LOCALITY, PHONE_PREFIXES, type LeadCountry } from "@/lib/lead-fields";
 import { submitLead } from "@/lib/leads.functions";
 import { captureReady, PRIVACY_URL, TURNSTILE_SITE_KEY } from "@/lib/contact-config";
-import { whatsappUrl } from "@/lib/brand";
 
 type Turnstile = { render: (el: HTMLElement, options: { sitekey: string; action: string; callback: (token: string) => void; "expired-callback": () => void; "error-callback": () => void }) => string; remove: (id: string) => void };
 
@@ -56,7 +55,7 @@ export function ContactForm({ initialService = "" }: { initialService?: string }
   const fieldError = (name: string) => errors[name] ? <p id={`${name}-error`} className="mt-1 text-sm text-destructive">{errors[name]}</p> : null;
   const invalid = (name: string) => ({ "aria-invalid": Boolean(errors[name]), "aria-describedby": errors[name] ? `${name}-error` : undefined });
   const localityLabel = LEAD_COUNTRIES.find(c => c.value === country)?.localityLabel ?? "Distrito o localidad";
-  if (success) return <div aria-live="polite" className="py-8"><h2 className="text-2xl">¡Gracias por contactar a Norita!</h2><p className="mt-4 leading-relaxed text-muted-foreground">Hemos recibido tu solicitud. Pronto nos pondremos en contacto contigo para conocer mejor lo que necesitas.</p><Button asChild variant="outline" className="mt-6 h-auto min-h-12 whitespace-normal"><a href={whatsappUrl()} target="_blank" rel="noopener noreferrer"><MessageCircle /> Si prefieres, escríbenos directamente por WhatsApp.</a></Button></div>;
+  if (success) return <div aria-live="polite" className="py-8"><h2 className="text-2xl">¡Gracias por contactar a Norita!</h2><p className="mt-4 leading-relaxed text-muted-foreground">Hemos recibido tu solicitud. Pronto nos pondremos en contacto contigo para conocer mejor lo que necesitas.</p></div>;
   return <form noValidate onSubmit={async event => {
     event.preventDefault();
     if (inFlight.current) return;
@@ -80,7 +79,7 @@ export function ContactForm({ initialService = "" }: { initialService?: string }
     } catch (error) { setErrors({ submit: error instanceof Error ? error.message : "No pudimos guardar tu solicitud. Inténtalo nuevamente." }); setCaptcha(""); setCaptchaKey(v => v + 1); }
     finally { inFlight.current = false; setBusy(false); }
   }} className="space-y-6" aria-busy={busy}>
-    {!captureReady && <p role="status" className="border-l-2 border-accent bg-secondary px-4 py-3 text-sm leading-relaxed">Estamos preparando este canal de contacto. Por ahora, escríbenos por WhatsApp para recibir información.</p>}
+    {!captureReady && <p role="status" className="border-l-2 border-accent bg-secondary px-4 py-3 text-sm leading-relaxed">Estamos preparando este canal de contacto. Vuelve pronto para enviar tu solicitud.</p>}
     <fieldset disabled={busy} className="space-y-6">
     <label className="block text-sm font-medium">Nombre completo <span aria-hidden="true">*</span><Input name="name" autoComplete="name" required maxLength={100} {...invalid("name")} className="mt-2 h-12 text-base" />{fieldError("name")}</label>
     <label className="block text-sm font-medium">Correo electrónico <span aria-hidden="true">*</span><Input name="email" type="email" autoComplete="email" inputMode="email" required maxLength={254} {...invalid("email")} className="mt-2 h-12 text-base" />{fieldError("email")}</label>
@@ -117,6 +116,5 @@ export function ContactForm({ initialService = "" }: { initialService?: string }
     {captureReady && !captcha && !busy && <p className="text-xs text-muted-foreground">Completa la verificación de seguridad para poder enviar.</p>}
     {errors["submit"] && <p role="alert" className="text-sm text-destructive">{errors["submit"]}</p>}
     <Button type="submit" disabled={!captureReady || busy || !captcha} className="h-12 w-full">{busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Send className="h-4 w-4" />}{busy ? "Enviando…" : "Enviar solicitud"}</Button>
-    <Button variant="outline" asChild className="h-12 w-full"><a href={whatsappUrl()} target="_blank" rel="noopener noreferrer"><MessageCircle className="h-5 w-5" /> Contactar por WhatsApp</a></Button>
   </form>;
 }
