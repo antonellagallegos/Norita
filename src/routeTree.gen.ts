@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ContactoRouteImport } from './routes/contacto'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
+import { Route as ApiIntegrationsRunRouteImport } from './routes/api.integrations.run'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const AdminLeadsRoute = AdminLeadsRouteImport.update({
   path: '/admin/leads',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiIntegrationsRunRoute = ApiIntegrationsRunRouteImport.update({
+  id: '/api/integrations/run',
+  path: '/api/integrations/run',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contacto': typeof ContactoRoute
   '/privacidad': typeof PrivacidadRoute
   '/admin/leads': typeof AdminLeadsRoute
+  '/api/integrations/run': typeof ApiIntegrationsRunRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contacto': typeof ContactoRoute
   '/privacidad': typeof PrivacidadRoute
   '/admin/leads': typeof AdminLeadsRoute
+  '/api/integrations/run': typeof ApiIntegrationsRunRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,22 @@ export interface FileRoutesById {
   '/contacto': typeof ContactoRoute
   '/privacidad': typeof PrivacidadRoute
   '/admin/leads': typeof AdminLeadsRoute
+  '/api/integrations/run': typeof ApiIntegrationsRunRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/contacto' | '/privacidad' | '/admin/leads'
+  fullPaths:
+    '/' | '/contacto' | '/privacidad' | '/admin/leads' | '/api/integrations/run'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contacto' | '/privacidad' | '/admin/leads'
-  id: '__root__' | '/' | '/contacto' | '/privacidad' | '/admin/leads'
+  to:
+    '/' | '/contacto' | '/privacidad' | '/admin/leads' | '/api/integrations/run'
+  id:
+    | '__root__'
+    | '/'
+    | '/contacto'
+    | '/privacidad'
+    | '/admin/leads'
+    | '/api/integrations/run'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +84,7 @@ export interface RootRouteChildren {
   ContactoRoute: typeof ContactoRoute
   PrivacidadRoute: typeof PrivacidadRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
+  ApiIntegrationsRunRoute: typeof ApiIntegrationsRunRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +117,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLeadsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/integrations/run': {
+      id: '/api/integrations/run'
+      path: '/api/integrations/run'
+      fullPath: '/api/integrations/run'
+      preLoaderRoute: typeof ApiIntegrationsRunRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +132,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactoRoute: ContactoRoute,
   PrivacidadRoute: PrivacidadRoute,
   AdminLeadsRoute: AdminLeadsRoute,
+  ApiIntegrationsRunRoute: ApiIntegrationsRunRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
