@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,26 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SERVICES, leadSchema } from "@/lib/leads";
 import { CITIES, LEAD_COUNTRIES, OTHER_CITY, PHONE_PREFIXES, type LeadCountry } from "@/lib/lead-fields";
 import { submitLead } from "@/lib/leads.functions";
-import { captureReady, PRIVACY_URL, TURNSTILE_SITE_KEY } from "@/lib/contact-config";
-
-type Turnstile = { render: (el: HTMLElement, options: { sitekey: string; action: string; callback: (token: string) => void; "expired-callback": () => void; "error-callback": () => void }) => string; remove: (id: string) => void };
-
-function Captcha({ onToken }: { onToken: (token: string) => void }) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!TURNSTILE_SITE_KEY) return;
-    let widget: string | undefined;
-    let cancelled = false;
-    const win = window as Window & { turnstile?: Turnstile };
-    const render = () => { if (!cancelled && ref.current && win.turnstile) widget = win.turnstile.render(ref.current, { sitekey: TURNSTILE_SITE_KEY, action: "norita_contact", callback: onToken, "expired-callback": () => onToken(""), "error-callback": () => onToken("") }); };
-    const existing = document.getElementById("norita-turnstile");
-    if (win.turnstile) render();
-    else if (existing) existing.addEventListener("load", render, { once: true });
-    else { const script = document.createElement("script"); script.id = "norita-turnstile"; script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"; script.async = true; script.addEventListener("load", render, { once: true }); document.head.appendChild(script); }
-    return () => { cancelled = true; existing?.removeEventListener("load", render); if (widget && win.turnstile) win.turnstile.remove(widget); };
-  }, [onToken]);
-  return <div ref={ref} />;
-}
+import { captureReady, PRIVACY_URL } from "@/lib/contact-config";
+import { Captcha } from "@/components/turnstile";
 
 const field = "mt-2 h-12 rounded-xl bg-card text-base";
 // Native selects for prefix, country and locality: long lists use the phone's own picker on mobile.

@@ -1,13 +1,14 @@
-// Server-only checks for the public contact form. Nothing here logs or returns personal data.
+// Server-only checks for the public forms (family contact and caregiver applications). Nothing here logs or returns personal data.
 
 export const TURNSTILE_ACTION = "norita_contact";
+export const CAREGIVER_TURNSTILE_ACTION = "norita_caregiver";
 
-export async function verifyTurnstile({ secret, token, submissionId, hostname }: { secret: string; token: string; submissionId: string; hostname: string }): Promise<boolean> {
+export async function verifyTurnstile({ secret, token, submissionId, hostname, action = TURNSTILE_ACTION }: { secret: string; token: string; submissionId: string; hostname: string; action?: string }): Promise<boolean> {
   const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body: new URLSearchParams({ secret, response: token, idempotency_key: submissionId }) });
   if (!response.ok) return false;
   const verification = await response.json() as { success?: boolean; action?: string; hostname?: string };
   // A token solved on another site must not be accepted here.
-  return verification.success === true && verification.action === TURNSTILE_ACTION && verification.hostname === hostname;
+  return verification.success === true && verification.action === action && verification.hostname === hostname;
 }
 
 export function clientAddress(request: Request): string {

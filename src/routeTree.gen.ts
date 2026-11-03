@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ContactoRouteImport } from './routes/contacto'
+import { Route as CuidadoresRouteImport } from './routes/cuidadores'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
+import { Route as PrivacidadCuidadoresRouteImport } from './routes/privacidad-cuidadores'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as ApiIntegrationsRunRouteImport } from './routes/api.integrations.run'
 
@@ -25,9 +27,19 @@ const ContactoRoute = ContactoRouteImport.update({
   path: '/contacto',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CuidadoresRoute = CuidadoresRouteImport.update({
+  id: '/cuidadores',
+  path: '/cuidadores',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacidadRoute = PrivacidadRouteImport.update({
   id: '/privacidad',
   path: '/privacidad',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadCuidadoresRoute = PrivacidadCuidadoresRouteImport.update({
+  id: '/privacidad-cuidadores',
+  path: '/privacidad-cuidadores',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLeadsRoute = AdminLeadsRouteImport.update({
@@ -44,14 +56,18 @@ const ApiIntegrationsRunRoute = ApiIntegrationsRunRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contacto': typeof ContactoRoute
+  '/cuidadores': typeof CuidadoresRoute
   '/privacidad': typeof PrivacidadRoute
+  '/privacidad-cuidadores': typeof PrivacidadCuidadoresRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/api/integrations/run': typeof ApiIntegrationsRunRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contacto': typeof ContactoRoute
+  '/cuidadores': typeof CuidadoresRoute
   '/privacidad': typeof PrivacidadRoute
+  '/privacidad-cuidadores': typeof PrivacidadCuidadoresRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/api/integrations/run': typeof ApiIntegrationsRunRoute
 }
@@ -59,22 +75,38 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/contacto': typeof ContactoRoute
+  '/cuidadores': typeof CuidadoresRoute
   '/privacidad': typeof PrivacidadRoute
+  '/privacidad-cuidadores': typeof PrivacidadCuidadoresRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/api/integrations/run': typeof ApiIntegrationsRunRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/contacto' | '/privacidad' | '/admin/leads' | '/api/integrations/run'
+    | '/'
+    | '/contacto'
+    | '/cuidadores'
+    | '/privacidad'
+    | '/privacidad-cuidadores'
+    | '/admin/leads'
+    | '/api/integrations/run'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/contacto' | '/privacidad' | '/admin/leads' | '/api/integrations/run'
+    | '/'
+    | '/contacto'
+    | '/cuidadores'
+    | '/privacidad'
+    | '/privacidad-cuidadores'
+    | '/admin/leads'
+    | '/api/integrations/run'
   id:
     | '__root__'
     | '/'
     | '/contacto'
+    | '/cuidadores'
     | '/privacidad'
+    | '/privacidad-cuidadores'
     | '/admin/leads'
     | '/api/integrations/run'
   fileRoutesById: FileRoutesById
@@ -82,7 +114,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContactoRoute: typeof ContactoRoute
+  CuidadoresRoute: typeof CuidadoresRoute
   PrivacidadRoute: typeof PrivacidadRoute
+  PrivacidadCuidadoresRoute: typeof PrivacidadCuidadoresRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   ApiIntegrationsRunRoute: typeof ApiIntegrationsRunRoute
 }
@@ -103,11 +137,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cuidadores': {
+      id: '/cuidadores'
+      path: '/cuidadores'
+      fullPath: '/cuidadores'
+      preLoaderRoute: typeof CuidadoresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacidad': {
       id: '/privacidad'
       path: '/privacidad'
       fullPath: '/privacidad'
       preLoaderRoute: typeof PrivacidadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidad-cuidadores': {
+      id: '/privacidad-cuidadores'
+      path: '/privacidad-cuidadores'
+      fullPath: '/privacidad-cuidadores'
+      preLoaderRoute: typeof PrivacidadCuidadoresRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/leads': {
@@ -130,7 +178,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContactoRoute: ContactoRoute,
+  CuidadoresRoute: CuidadoresRoute,
   PrivacidadRoute: PrivacidadRoute,
+  PrivacidadCuidadoresRoute: PrivacidadCuidadoresRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   ApiIntegrationsRunRoute: ApiIntegrationsRunRoute,
 }

@@ -50,6 +50,13 @@
       "when": 1793130000000,
       "tag": "0006_add_medication_pickup_and_weekend_services",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793140000000,
+      "tag": "0007_caregiver_applications",
+      "breakpoints": true
     }
   ]
 }
