@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SERVICES } from "@/lib/leads";
-import { OTHER_LOCALITY } from "@/lib/lead-fields";
+import { OTHER_CITY } from "@/lib/lead-fields";
 
 const mock = vi.hoisted(() => ({ submit: vi.fn() }));
 vi.mock("@/lib/contact-config", async (importOriginal) => ({ ...(await importOriginal<object>()), captureReady: true, PRIVACY_URL: "/privacidad", TURNSTILE_SITE_KEY: "test-site-key" }));
@@ -16,7 +16,7 @@ function fillValid() {
   fireEvent.change(screen.getByLabelText(/Correo electrónico/), { target: { value: "prueba@example.com" } });
   fireEvent.change(screen.getByRole("textbox", { name: /Número de WhatsApp/ }), { target: { value: "987 654 321" } });
   fireEvent.change(select(/^País/), { target: { value: "PE" } });
-  fireEvent.change(select(/^Distrito/), { target: { value: "Miraflores" } });
+  fireEvent.change(select(/^Ciudad/), { target: { value: "Lima Metropolitana" } });
   fireEvent.click(screen.getByRole("checkbox", { name: /Autorizo el tratamiento/ }));
 }
 function deferred<T>() { let resolve!: (v: T) => void, reject!: (e: unknown) => void; const promise = new Promise<T>((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; }
@@ -34,24 +34,34 @@ describe("Public contact form", () => {
   it("does not submit when any of the five required fields is missing and shows each error by its field", () => {
     fireEvent.click(submitButton());
     expect(mock.submit).not.toHaveBeenCalled();
-    for (const message of [/Introduce tu nombre completo/, /Introduce tu correo/, /Introduce tu número de WhatsApp/, /Selecciona Perú o Colombia/, /Selecciona el distrito o la localidad/]) expect(screen.getByText(message)).toBeInTheDocument();
+    for (const message of [/Introduce tu nombre completo/, /Introduce tu correo/, /Introduce tu número de WhatsApp/, /Selecciona Perú o Colombia/, /Selecciona la ciudad/]) expect(screen.getByText(message)).toBeInTheDocument();
     expect(screen.getByLabelText(/Correo electrónico/)).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("links the required consent to the privacy policy page", () => {
+    expect(screen.getByRole("link", { name: "política de privacidad" })).toHaveAttribute("href", "/privacidad");
   });
 
   it("offers only Peru and Colombia for the older adult's location", () => {
     expect([...select(/^País/).options].map(o => o.value).filter(Boolean)).toEqual(["PE", "CO"]);
   });
 
-  it("clears the selected locality when the country changes and shows that country's list", () => {
+  it("clears the selected city when the country changes and shows that country's cities", () => {
     fireEvent.change(select(/^País/), { target: { value: "PE" } });
-    fireEvent.change(select(/^Distrito/), { target: { value: "Miraflores" } });
+    fireEvent.change(select(/^Ciudad/), { target: { value: "Callao" } });
     fireEvent.change(select(/^País/), { target: { value: "CO" } });
-    const locality = select(/^Localidad de Bogotá/);
-    expect(locality.value).toBe("");
-    const values = [...locality.options].map(o => o.value);
-    expect(values).toContain("Chapinero");
-    expect(values).not.toContain("Miraflores");
-    expect(values).toContain(OTHER_LOCALITY);
+    const city = select(/^Ciudad/);
+    expect(city.value).toBe("");
+    const values = [...city.options].map(o => o.value);
+    expect(values).toContain("Bogotá D.C.");
+    expect(values).not.toContain("Callao");
+    expect(values).toContain(OTHER_CITY);
+  });
+
+  it("asks only for contact details, location, service and consents, with no free-text field", () => {
+    expect(screen.queryByRole("textbox", { name: /Comentario/ })).not.toBeInTheDocument();
+    expect(screen.queryByText(/Más detalles/)).not.toBeInTheDocument();
+    expect(document.querySelector("textarea")).toBeNull();
   });
 
   it("offers Peru, Colombia and other international prefixes", () => {
@@ -71,7 +81,7 @@ describe("Public contact form", () => {
     expect(submitButton()).toHaveTextContent("Enviando…");
     expect(screen.queryByText(/Gracias por contactar/)).not.toBeInTheDocument();
     const sent = mock.submit.mock.calls[0]?.[0].data;
-    expect(sent).toMatchObject({ name: "Persona de prueba", email: "prueba@example.com", phone_prefix: "PE", phone: "987 654 321", country: "PE", district: "Miraflores", consent_processing: true, consent_contact: false });
+    expect(sent).toMatchObject({ name: "Persona de prueba", email: "prueba@example.com", phone_prefix: "PE", phone: "987 654 321", country: "PE", city: "Lima Metropolitana", consent_processing: true, consent_contact: false });
     await act(async () => { pending.resolve({ success: true }); });
     expect(screen.getByText(/Gracias por contactar/)).toBeInTheDocument();
   });

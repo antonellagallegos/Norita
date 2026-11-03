@@ -24,8 +24,8 @@ export const submitLead = createServerFn({ method: "POST" }).inputValidator((inp
   if (duplicate.error) throw new Error("No pudimos guardar tu solicitud. Inténtalo de nuevo.");
   const { data: inserted, error } = await supabaseAdmin.from("leads").insert({
     name: data.name, email: data.email, phone: data.phone, service_interest: data.service_interest,
-    country: data.country, district: data.district, frequency: data.frequency || null,
-    preferred_contact: data.preferred_contact, message: data.message || null,
+    // The city is stored in the existing `district` column.
+    country: data.country, district: data.city,
     consent_contact: data.consent_contact, consent_timestamp: data.consent_contact ? new Date().toISOString() : null,
     consent_processing: true, privacy_version: PRIVACY_VERSION,
     duplicate_of: duplicate.data?.id ?? null, submission_id: data.submission_id,

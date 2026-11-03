@@ -59,27 +59,21 @@ export function normalizePhone(prefixKey: string, input: string): { ok: true; di
 
 export const formatPhone = (digits: string) => (digits ? `+${digits}` : "");
 
-// Location of the older adult. Only the countries Norita serves.
+// Where the service would be provided. Only the countries Norita serves, and only the city: the form
+// collects the minimum needed to know whether Norita covers the area.
 export const LEAD_COUNTRIES = [
-  { value: "PE", label: "Perú", localityLabel: "Distrito" },
-  { value: "CO", label: "Colombia", localityLabel: "Localidad de Bogotá" },
+  { value: "PE", label: "Perú" },
+  { value: "CO", label: "Colombia" },
 ] as const;
 export type LeadCountry = (typeof LEAD_COUNTRIES)[number]["value"];
 export const countryLabel = (value: string | null | undefined) => LEAD_COUNTRIES.find(c => c.value === value)?.label ?? "—";
 
-// Current coverage, not every district or municipality of each country:
-// Peru: the 43 districts of the province of Lima and the 7 of Callao (Lima Metropolitana).
-// Colombia: the 20 localidades of Bogotá D.C. (pilot city).
-// Anything else is captured as OTHER_LOCALITY so the request is never lost.
-export const OTHER_LOCALITY = "Otra ubicación (fuera de la cobertura actual)";
-export const LOCALITIES: Record<LeadCountry, { group: string; items: readonly string[] }[]> = {
-  PE: [
-    { group: "Lima", items: ["Ancón", "Ate", "Barranco", "Breña", "Carabayllo", "Cercado de Lima", "Chaclacayo", "Chorrillos", "Cieneguilla", "Comas", "El Agustino", "Independencia", "Jesús María", "La Molina", "La Victoria", "Lince", "Los Olivos", "Lurigancho-Chosica", "Lurín", "Magdalena del Mar", "Miraflores", "Pachacámac", "Pucusana", "Pueblo Libre", "Puente Piedra", "Punta Hermosa", "Punta Negra", "Rímac", "San Bartolo", "San Borja", "San Isidro", "San Juan de Lurigancho", "San Juan de Miraflores", "San Luis", "San Martín de Porres", "San Miguel", "Santa Anita", "Santa María del Mar", "Santa Rosa", "Santiago de Surco", "Surquillo", "Villa El Salvador", "Villa María del Triunfo"] },
-    { group: "Callao", items: ["Bellavista", "Callao", "Carmen de la Legua-Reynoso", "La Perla", "La Punta", "Mi Perú", "Ventanilla"] },
-  ],
-  CO: [
-    { group: "Bogotá D.C.", items: ["Antonio Nariño", "Barrios Unidos", "Bosa", "Chapinero", "Ciudad Bolívar", "Engativá", "Fontibón", "Kennedy", "La Candelaria", "Los Mártires", "Puente Aranda", "Rafael Uribe Uribe", "San Cristóbal", "Santa Fe", "Suba", "Sumapaz", "Teusaquillo", "Tunjuelito", "Usaquén", "Usme"] },
-  ],
+// Current coverage: Lima Metropolitana and Callao (Peru) and Bogotá D.C. (Colombia, pilot city).
+// Anything else is captured as OTHER_CITY so the request is never lost. Stored in `leads.district`.
+export const OTHER_CITY = "Otra ciudad (fuera de la cobertura actual)";
+export const CITIES: Record<LeadCountry, readonly string[]> = {
+  PE: ["Lima Metropolitana", "Callao"],
+  CO: ["Bogotá D.C."],
 };
-export const isValidLocality = (country: string, locality: string) =>
-  locality === OTHER_LOCALITY || (country in LOCALITIES && LOCALITIES[country as LeadCountry].some(g => g.items.includes(locality)));
+export const isValidCity = (country: string, city: string) =>
+  city === OTHER_CITY || (country in CITIES && CITIES[country as LeadCountry].includes(city));
