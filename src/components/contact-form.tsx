@@ -29,8 +29,9 @@ function Captcha({ onToken }: { onToken: (token: string) => void }) {
   return <div ref={ref} />;
 }
 
+const field = "mt-2 h-12 rounded-xl bg-card text-base";
 // Native selects for prefix, country and locality: long lists use the phone's own picker on mobile.
-const nativeSelect = "mt-2 flex h-12 w-full rounded-md border border-input bg-background px-3 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring aria-[invalid=true]:border-destructive";
+const nativeSelect = "mt-2 flex h-12 w-full rounded-xl border border-input bg-card px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-[invalid=true]:border-destructive";
 
 export function ContactForm({ initialService = "" }: { initialService?: string }) {
   const send = useServerFn(submitLead);
@@ -51,7 +52,7 @@ export function ContactForm({ initialService = "" }: { initialService?: string }
   const [success, setSuccess] = useState(false);
   const fieldError = (name: string) => errors[name] ? <p id={`${name}-error`} className="mt-1 text-sm text-destructive">{errors[name]}</p> : null;
   const invalid = (name: string) => ({ "aria-invalid": Boolean(errors[name]), "aria-describedby": errors[name] ? `${name}-error` : undefined });
-  if (success) return <div aria-live="polite" className="py-8"><h2 className="text-2xl">¡Gracias por contactar a Norita!</h2><p className="mt-4 leading-relaxed text-muted-foreground">Hemos recibido tu solicitud. Pronto nos pondremos en contacto contigo para conocer mejor lo que necesitas.</p></div>;
+  if (success) return <div aria-live="polite" className="py-8"><h2 className="text-3xl">¡Gracias por contactar a Norita!</h2><p className="mt-4 leading-relaxed text-muted-foreground">Hemos recibido tu solicitud. Pronto nos pondremos en contacto contigo para conocer mejor lo que necesitas.</p></div>;
   return <form noValidate onSubmit={async event => {
     event.preventDefault();
     if (inFlight.current) return;
@@ -75,20 +76,20 @@ export function ContactForm({ initialService = "" }: { initialService?: string }
     } catch (error) { setErrors({ submit: error instanceof Error ? error.message : "No pudimos guardar tu solicitud. Inténtalo nuevamente." }); setCaptcha(""); setCaptchaKey(v => v + 1); }
     finally { inFlight.current = false; setBusy(false); }
   }} className="space-y-6" aria-busy={busy}>
-    {!captureReady && <p role="status" className="border-l-2 border-accent bg-secondary px-4 py-3 text-sm leading-relaxed">Estamos preparando este canal de contacto. Vuelve pronto para enviar tu solicitud.</p>}
+    {!captureReady && <p role="status" className="rounded-2xl border-l-4 border-highlight bg-secondary px-5 py-4 text-sm leading-relaxed">Estamos preparando este canal de contacto. Vuelve pronto para enviar tu solicitud.</p>}
     <fieldset disabled={busy} className="space-y-6">
-    <label className="block text-sm font-medium">Nombre completo <span aria-hidden="true">*</span><Input name="name" autoComplete="name" required maxLength={100} {...invalid("name")} className="mt-2 h-12 text-base" />{fieldError("name")}</label>
-    <label className="block text-sm font-medium">Correo electrónico <span aria-hidden="true">*</span><Input name="email" type="email" autoComplete="email" inputMode="email" required maxLength={254} {...invalid("email")} className="mt-2 h-12 text-base" />{fieldError("email")}</label>
+    <label className="block text-sm font-medium">Nombre completo <span aria-hidden="true">*</span><Input name="name" autoComplete="name" required maxLength={100} {...invalid("name")} className={field} />{fieldError("name")}</label>
+    <label className="block text-sm font-medium">Correo electrónico <span aria-hidden="true">*</span><Input name="email" type="email" autoComplete="email" inputMode="email" required maxLength={254} {...invalid("email")} className={field} />{fieldError("email")}</label>
     <div>
       <span id="phone-label" className="text-sm font-medium">Número de WhatsApp <span aria-hidden="true">*</span></span>
       <div className="grid grid-cols-[minmax(0,8.5rem)_minmax(0,1fr)] gap-2">
         <select aria-label="Prefijo internacional" value={phonePrefix} onChange={e => setPhonePrefix(e.target.value)} {...invalid("phone_prefix")} className={nativeSelect}>{PHONE_PREFIXES.map(p => <option key={p.key} value={p.key}>{p.label} +{p.code}</option>)}</select>
-        <Input name="phone" type="tel" autoComplete="tel-national" inputMode="tel" required maxLength={24} aria-labelledby="phone-label" placeholder={phonePrefix === "PE" ? "987 654 321" : phonePrefix === "CO" ? "300 123 4567" : ""} {...invalid("phone")} className="mt-2 h-12 text-base" />
+        <Input name="phone" type="tel" autoComplete="tel-national" inputMode="tel" required maxLength={24} aria-labelledby="phone-label" placeholder={phonePrefix === "PE" ? "987 654 321" : phonePrefix === "CO" ? "300 123 4567" : ""} {...invalid("phone")} className={field} />
       </div>
       <p className="mt-1 text-xs text-muted-foreground">Prefijo seleccionado: +{PHONE_PREFIXES.find(p => p.key === phonePrefix)?.code}. Si escribes el número con código de país, no se duplica.</p>
       {fieldError("phone_prefix")}{fieldError("phone")}
     </div>
-    <div><label htmlFor="service-interest" className="text-sm font-medium">Servicio de interés *</label><Select value={service} onValueChange={setService}><SelectTrigger id="service-interest" aria-invalid={Boolean(errors["service_interest"])} className="mt-2 h-12"><SelectValue placeholder="Selecciona un servicio" /></SelectTrigger><SelectContent>{SERVICES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent></Select>{fieldError("service_interest")}</div>
+    <div><label htmlFor="service-interest" className="text-sm font-medium">Servicio de interés *</label><Select value={service} onValueChange={setService}><SelectTrigger id="service-interest" aria-invalid={Boolean(errors["service_interest"])} className="mt-2 h-12 rounded-xl border-input bg-card"><SelectValue placeholder="Selecciona un servicio" /></SelectTrigger><SelectContent>{SERVICES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent></Select>{fieldError("service_interest")}</div>
     <fieldset className="space-y-5">
       <legend className="text-sm font-medium">¿Dónde necesitas el servicio?</legend>
       <div className="grid gap-5 sm:grid-cols-2">
@@ -106,6 +107,6 @@ export function ContactForm({ initialService = "" }: { initialService?: string }
     {captureReady && <Captcha key={captchaKey} onToken={setCaptcha} />}
     {captureReady && !captcha && !busy && <p className="text-xs text-muted-foreground">Completa la verificación de seguridad para poder enviar.</p>}
     {errors["submit"] && <p role="alert" className="text-sm text-destructive">{errors["submit"]}</p>}
-    <Button type="submit" disabled={!captureReady || busy || !captcha} className="h-12 w-full">{busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Send className="h-4 w-4" />}{busy ? "Enviando…" : "Enviar solicitud"}</Button>
+    <Button type="submit" size="lg" disabled={!captureReady || busy || !captcha} className="w-full">{busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Send className="h-4 w-4" />}{busy ? "Enviando…" : "Enviar solicitud"}</Button>
   </form>;
 }

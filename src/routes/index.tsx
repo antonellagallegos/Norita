@@ -1,19 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowRight, Heart, UserRound, ShieldCheck, Sprout, Check, Menu, X } from "lucide-react";
+import type { CSSProperties, ReactNode } from "react";
+import { ArrowRight } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { BRAND } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArcShape, DiagonalShape, Dot, HalfDisc, ModuleGrid, useScrollReveal } from "@/components/brand";
+import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { NoritaAppSection } from "@/components/norita-app-section";
 import { InformationButton, ScheduleCall } from "@/components/contact-options";
 import { SERVICES } from "@/lib/leads";
-import hero from "@/assets/norita-care.jpg";
-import family from "@/assets/family.jpg";
-import citas from "@/assets/citas.jpg";
-import mente from "@/assets/mente.jpg";
-import fuerza from "@/assets/fuerza.jpg";
-import vida from "@/assets/vida.jpg";
-import paseo from "@/assets/hero.jpg";
+// Provisional lifestyle photography (Pexels license, see src/assets/PHOTO_CREDITS.md) until Norita's own shoot.
+import heroPortrait from "@/assets/life-red-hat.jpg";
+import laugh from "@/assets/life-laugh.jpg";
+import couple from "@/assets/life-couple.jpg";
+import style from "@/assets/life-style.jpg";
+import drive from "@/assets/life-drive.jpg";
+import bike from "@/assets/life-bike.jpg";
+import walk from "@/assets/life-walk.jpg";
+import companion from "@/assets/care-companion.jpg";
+import mind from "@/assets/care-mind.jpg";
+import strength from "@/assets/care-strength.jpg";
+import weekend from "@/assets/care-weekend.jpg";
 
 const TITLE = "Norita | Acompañamiento y bienestar para adultos mayores en Lima";
 const DESC =
@@ -33,71 +40,52 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const btn =
-  "inline-flex h-12 items-center justify-center gap-2 rounded-md px-6 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
-const btnPrimary = `${btn} bg-primary text-primary-foreground shadow-none hover:bg-primary/90`;
-const btnGhost = `${btn} border border-primary/25 bg-background text-primary shadow-none hover:bg-secondary`;
-
 // Every information CTA leads to the contact form; WhatsApp contact will be configured later.
-function RequestInfoButton({ className = btnPrimary }: { className?: string }) {
+function RequestInfoButton({ variant = "default" }: { variant?: "default" | "outline" | "highlight" }) {
   return (
-    <Button asChild className={className}><Link to="/contacto">
-      Solicitar información <ArrowRight className="h-4 w-4" />
+    <Button asChild size="lg" variant={variant}><Link to="/contacto">
+      Solicitar información <ArrowRight />
     </Link></Button>
   );
 }
 
-function Logo() {
-  return (
-    <a href="#inicio" aria-label="Norita, inicio" className="flex min-w-0 items-center gap-2 font-display text-2xl font-semibold text-primary sm:gap-2.5 sm:text-[1.8rem]">
-      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-secondary text-primary"><Heart className="h-5 w-5" strokeWidth={1.6} /></span>
-      norita<span className="self-start text-lg text-accent">+</span>
-    </a>
-  );
+function Eyebrow({ children, dark = false, dot = "bg-highlight" }: { children: ReactNode; dark?: boolean; dot?: string }) {
+  return <p className={`eyebrow ${dark ? "text-primary-foreground/80" : "text-primary"}`}><Dot className={`h-2 w-2 ${dot}`} />{children}</p>;
 }
-
-const nav = [
-  ["Servicios", "#servicios"],
-  ["Nuestra app", "#app"],
-  ["Cómo funciona", "#como-funciona"],
-  ["Sobre Norita", "#sobre"],
-  ["Contacto", "#contacto"],
-];
 
 const services = [
   {
-    img: citas, title: "Acompañamiento a citas médicas", service: SERVICES[0],
+    img: companion, alt: "Adulta mayor conversando con una acompañante en un jardín", title: "Acompañamiento a citas médicas", service: SERVICES[0],
     desc: "Que tus padres no tengan que ir solos. Les acompañamos a sus consultas médicas con atención, paciencia y responsabilidad, manteniéndote informado sobre el acompañamiento realizado.",
     items: ["Acompañamiento durante la cita.", "Apoyo y orientación logística durante la visita.", "Comunicación con la familia según lo acordado."],
   },
   {
-    img: mente, title: "Neuroestimulación — Gimnasio Mental", service: SERVICES[1],
+    img: mind, alt: "Dos amigas mayores resolviendo un crucigrama con un café", title: "Neuroestimulación — Gimnasio Mental", service: SERVICES[1],
     desc: "Un espacio para mantener la mente activa, aprender y disfrutar. Sesiones de estimulación cognitiva con actividades adaptadas a los intereses y capacidades de cada adulto mayor.",
     items: ["Ejercicios de memoria y atención.", "Actividades de lenguaje y razonamiento.", "Juegos, retos y actividades significativas."],
   },
   {
-    img: fuerza, title: "Entrenamiento de fuerza", service: SERVICES[2],
+    img: strength, alt: "Mujer mayor en una clase de movimiento", title: "Entrenamiento de fuerza", service: SERVICES[2],
     desc: "Seguir moviéndose también es una forma de cuidarse. Sesiones adaptadas para trabajar fuerza, equilibrio, movilidad y autonomía en la vida cotidiana, con evaluación previa.",
     items: ["Ejercicios adaptados a la capacidad individual.", "Trabajo de fuerza y movilidad funcional.", "Atención a la seguridad y progresión del entrenamiento."],
   },
   {
-    // Placeholder photo until a dedicated one is available.
-    img: family, title: "Recogida de medicamentos", service: SERVICES[3],
+    img: walk, alt: "Mujer mayor sonriendo durante un paseo al aire libre", title: "Recogida de medicamentos", service: SERVICES[3],
     desc: "Para que tus padres no tengan que hacer filas ni desplazamientos. Recogemos sus medicamentos en la farmacia o el centro de salud y se los llevamos a casa. No administramos medicamentos ni modificamos tratamientos.",
     items: ["Recogida en la farmacia o el centro de salud.", "Entrega en casa en el horario acordado.", "Aviso a la familia cuando se completa la entrega."],
   },
   {
-    img: paseo, imgPosition: "object-[50%_20%]", title: "Acompañamiento fines de semana", service: SERVICES[4],
+    img: weekend, alt: "Adulta mayor y una acompañante mirando juntas un teléfono en el parque", title: "Acompañamiento fines de semana", service: SERVICES[4],
     desc: "Cuando la rutina cambia y la familia necesita apoyo, acompañamos a tus padres durante el fin de semana con compañía, conversación y actividades a su ritmo.",
     items: ["Compañía en casa o en paseos cercanos.", "Actividades y conversación según sus intereses.", "Comunicación con la familia según lo acordado."],
   },
 ];
 
 const pillars = [
-  { icon: Heart, t: "Trato humano", d: "Escuchamos, respetamos los ritmos y cuidamos la dignidad de cada persona." },
-  { icon: UserRound, t: "Atención personalizada", d: "Cada adulto mayor tiene necesidades, preferencias y capacidades diferentes." },
-  { icon: ShieldCheck, t: "Confianza para la familia", d: "Comunicación clara sobre el servicio realizado y lo que se haya acordado compartir." },
-  { icon: Sprout, t: "Bienestar con propósito", d: "Promovemos el movimiento, la participación y actividades que aporten valor a la vida cotidiana." },
+  { shape: <Dot className="h-12 w-12 bg-highlight" />, t: "Trato humano", d: "Escuchamos, respetamos los ritmos y cuidamos la dignidad de cada persona." },
+  { shape: <ArcShape className="h-12 w-12 text-highlight" />, t: "Atención personalizada", d: "Cada adulto mayor tiene necesidades, preferencias y capacidades diferentes." },
+  { shape: <HalfDisc className="h-12 w-14 self-end text-highlight" />, t: "Confianza para la familia", d: "Comunicación clara sobre el servicio realizado y lo que se haya acordado compartir." },
+  { shape: <DiagonalShape className="h-12 w-12 text-highlight" />, t: "Bienestar con propósito", d: "Promovemos el movimiento, la participación y actividades que aporten valor a la vida cotidiana." },
 ];
 
 const steps = [
@@ -117,213 +105,258 @@ const faqs = [
   ["¿Qué información necesitan para comenzar?", "Datos básicos de tu padre o madre, el servicio que te interesa y cualquier necesidad particular. Te guiamos paso a paso después de tu solicitud."],
 ];
 
-function Index() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  return (
-    <div id="inicio" className="norita-page bg-background text-foreground">
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
-        <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 md:flex md:justify-between md:px-10 md:py-4">
-          <Logo />
-          <nav className="hidden gap-4 md:flex lg:gap-7" aria-label="Navegación principal">
-            {nav.map(([l, h]) => (
-              <a key={h} href={h} className="text-[0.95rem] font-medium text-foreground/80 transition-colors hover:text-primary">{l}</a>
-            ))}
-          </nav>
-          <div className="flex shrink-0 items-center gap-2">
-            <RequestInfoButton className={`${btnPrimary} hidden h-10 px-4 sm:inline-flex`} />
-            <Button variant="ghost" size="icon" className="h-11 w-11 text-primary md:hidden" aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</Button>
-          </div>
-        </div>
-        {menuOpen && <nav id="mobile-navigation" aria-label="Navegación móvil" className="border-t border-border bg-background px-5 pb-4 md:hidden">
-          {nav.map(([label, href]) => <Button key={href} asChild variant="ghost" className="h-12 w-full justify-between rounded-none border-b border-border text-base font-medium text-primary"><a href={href} onClick={() => setMenuOpen(false)}>{label}<ArrowRight /></a></Button>)}
-        </nav>}
-      </header>
+const trust = ["Cuidado humano y respetuoso", "Atención personalizada", "Comunicación con la familia"];
 
-      <main>
-        {/* Hero */}
-        <section className="care-hero relative isolate overflow-hidden">
-          <img src={hero} alt="Adulta mayor conversando con una acompañante de Norita" width={1920} height={1024} fetchPriority="high" className="care-hero-image" />
-          <div className="relative mx-auto max-w-7xl px-5 py-14 md:px-10 md:py-20">
-            <div className="care-hero-copy animate-rise">
-              <p className="mb-5 flex min-w-0 items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-widest text-primary sm:text-xs"><span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" /> Bienestar para adultos mayores · Lima</p>
-              <h1 className="font-display text-5xl font-medium leading-none sm:text-6xl md:text-7xl">Norita</h1>
-              <h2 className="mt-4 max-w-md text-[1.75rem] font-medium leading-tight sm:mt-5 sm:text-3xl md:text-4xl">Cuidado cercano.<br />Tranquilidad para tu familia.</h2>
-              <p className="mt-6 max-w-sm text-base leading-relaxed text-muted-foreground">Acompañamos a tus padres, cuidamos su mente y fortalecemos su autonomía. Con respeto, atención y calidez.</p>
-              <div className="hero-actions mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-1 sm:mt-8 sm:flex sm:gap-3">
+// Staggers the scroll reveal of sibling elements.
+const delay = (ms: number) => ({ "--reveal-delay": `${ms}ms` }) as CSSProperties;
+
+// Small photo set inline in a headline, as in editorial layouts.
+function Pill({ src, className = "" }: { src: string; className?: string }) {
+  return <img src={src} alt="" aria-hidden="true" loading="lazy" className={`mx-[0.08em] inline-block h-[0.82em] w-[1.7em] -translate-y-[0.06em] rounded-full object-cover align-middle ${className}`} />;
+}
+
+function Index() {
+  useScrollReveal();
+  return (
+    <div className="bg-background text-foreground">
+      <SiteHeader />
+
+      <main className="overflow-x-clip">
+        {/* Hero: an oversized editorial poster. LIFE, ON YOUR TERMS. */}
+        <section className="relative">
+          <div className="frame grid items-center gap-12 pb-16 pt-8 md:pt-12 lg:min-h-[min(calc(100svh-4.5rem),54rem)] lg:grid-cols-12 lg:gap-8 lg:pb-12 lg:pt-6">
+            <div className="min-w-0 animate-rise lg:col-span-6">
+              <Eyebrow>Bienestar para adultos mayores · Lima</Eyebrow>
+              <h1 className="mt-6 text-[3rem] leading-[0.98] tracking-[-0.045em] sm:text-7xl lg:text-[5.4rem]">
+                Cuidado cercano.{" "}
+                <span className="relative isolate inline-block whitespace-nowrap">
+                  <span aria-hidden="true" className="absolute inset-x-[-0.12em] bottom-[0.06em] top-[0.18em] -z-10 -rotate-1 rounded-full bg-highlight" />
+                  Tranquilidad
+                </span>{" "}
+                para tu familia.
+              </h1>
+              <p className="mt-8 max-w-md text-lg leading-relaxed text-muted-foreground">Acompañamos a tus padres, cuidamos su mente y fortalecemos su autonomía. Con respeto, atención y calidez.</p>
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <RequestInfoButton />
-                <Button variant="ghost" asChild className="h-12 px-3 text-primary"><a href="#servicios">Ver servicios <ArrowRight /></a></Button>
+                <Button asChild size="lg" variant="outline"><a href="#servicios">Ver servicios <ArrowRight /></a></Button>
+              </div>
+              <ul className="mt-12 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-foreground/80">
+                {trust.map((label) => (
+                  <li key={label} className="flex items-center gap-2"><Dot className="h-2 w-2 bg-primary" />{label}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="relative mx-auto w-full max-w-[28rem] sm:max-w-[34rem] lg:col-span-6 lg:max-w-none">
+              <div className="relative ml-auto h-[30rem] w-[88%] sm:h-[38rem] lg:h-[min(76svh,42rem)]">
+                <img src={heroPortrait} alt="Mujer mayor con sombrero rojo y gafas de sol, sonriendo con los brazos abiertos" width={1200} height={1398} fetchPriority="high" className="h-full w-full rounded-[2rem] rounded-tl-[11rem] object-cover object-[50%_30%] sm:rounded-tl-[16rem]" />
+                <ArcShape className="absolute -bottom-6 -left-10 w-32 -rotate-90 text-highlight sm:w-44" />
+                <Dot className="absolute -right-3 top-10 h-14 w-14 bg-primary sm:-right-6 sm:h-20 sm:w-20" />
+              </div>
+              <div className="absolute left-0 top-16 flex max-w-[16rem] items-center gap-3 rounded-full bg-card py-2 pl-2 pr-5 shadow-soft">
+                <img src={style} alt="" aria-hidden="true" className="h-12 w-12 shrink-0 rounded-full object-cover object-top" />
+                <p className="font-display text-[0.95rem] font-bold leading-tight text-primary">La vida sigue siendo tuya.</p>
               </div>
             </div>
           </div>
         </section>
-        <div className="border-y border-border bg-background">
-          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-5 py-6 text-sm font-medium text-primary sm:grid-cols-3 md:px-10">
-            <span className="flex min-w-0 items-center gap-3"><Heart className="h-4 w-4 shrink-0 text-accent" /> Cuidado humano y respetuoso</span>
-            <span className="flex min-w-0 items-center gap-3"><UserRound className="h-4 w-4 shrink-0 text-accent" /> Atención personalizada</span>
-            <span className="flex min-w-0 items-center gap-3"><ShieldCheck className="h-4 w-4 shrink-0 text-accent" /> Comunicación con la familia</span>
+
+        {/* Tilted service ribbon. Decorative: the services are listed in full below. */}
+        <div aria-hidden="true" className="relative z-10 -my-2 -rotate-[1.5deg] scale-x-105 bg-primary py-4 text-primary-foreground sm:py-5">
+          <div className="flex w-max animate-marquee">
+            {[0, 1].map((copy) => (
+              <div key={copy} className="flex shrink-0 items-center">
+                {[...SERVICES.slice(0, 5), ...SERVICES.slice(0, 5)].map((service, i) => (
+                  <span key={i} className="flex items-center gap-6 pr-6 font-display text-lg font-bold sm:text-2xl">
+                    {service}<Dot className="h-3 w-3 bg-highlight" />
+                  </span>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Preocupación */}
-        <section className="bg-background py-16 md:py-24">
-          <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 md:grid-cols-2 md:px-8">
-            <img src={family} alt="Hija compartiendo un café con su padre" loading="lazy" width={1280} height={960} className="aspect-[4/3] w-full rounded-md object-cover" />
-            <div>
-              <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-accent">A tu lado, incluso a la distancia</p>
-              <h2 className="text-3xl font-medium leading-tight md:text-4xl">Quieres estar ahí para tus padres. Pero no siempre puedes estar en todo.</h2>
-              <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-                Coordinar una cita médica, encontrar actividades que mantengan su mente activa o ayudarles a conservar su fuerza y movilidad requiere tiempo, atención y constancia.
-              </p>
-              <p className="mt-4 text-lg font-medium leading-relaxed text-foreground">
+        {/* The coordination load, as one big editorial sentence. */}
+        <section className="py-24 md:py-32">
+          <div className="frame">
+            <h2 data-reveal className="max-w-6xl text-[2.3rem] leading-[1.04] tracking-[-0.04em] sm:text-6xl lg:text-[4.4rem]">
+              Quieres estar ahí <Pill src={drive} /> para tus padres. Pero no siempre puedes <span className="underline decoration-highlight decoration-[0.14em] underline-offset-[0.14em]">estar en todo</span> <Pill src={bike} />
+            </h2>
+            <div data-reveal className="mt-14 grid gap-8 border-t border-border pt-10 md:grid-cols-12">
+              <p className="font-display text-xl font-bold leading-snug text-primary md:col-span-5 lg:col-span-4">
                 Norita te ayuda a acompañarlos mejor, incluso cuando no puedes estar físicamente a su lado.
+              </p>
+              <p className="text-lg leading-relaxed text-muted-foreground md:col-span-6 md:col-start-7">
+                Coordinar una cita médica, encontrar actividades que mantengan su mente activa o ayudarles a conservar su fuerza y movilidad requiere tiempo, atención y constancia.
               </p>
             </div>
           </div>
         </section>
 
-        {/* Servicios */}
-        <section id="servicios" className="scroll-mt-20 bg-secondary/60 py-16 md:py-24">
-          <div className="mx-auto max-w-7xl px-5 md:px-8">
-            <div className="max-w-2xl">
-              <p className="text-sm font-semibold uppercase tracking-widest text-accent">Servicios</p>
-              <h2 className="mt-3 text-3xl font-medium leading-tight md:text-4xl">Cinco formas de cuidar mejor.</h2>
+        {/* Services: an interactive index. Pick one and the photo and details follow. */}
+        <section id="servicios" className="scroll-mt-20 bg-secondary py-20 md:py-28">
+          <Tabs defaultValue="0" orientation="vertical" className="frame grid gap-10 lg:grid-cols-12 lg:gap-12">
+            <div className="min-w-0 lg:col-span-5">
+              <Eyebrow>Servicios</Eyebrow>
+              <h2 className="mt-5 text-[2.2rem] leading-[1.04] sm:text-5xl lg:text-6xl">Cinco formas de cuidar mejor.</h2>
+              <TabsList className="-mx-4 mt-10 flex h-auto justify-start gap-2 overflow-x-auto bg-transparent p-0 px-4 pb-2 text-foreground sm:mx-0 sm:px-0 lg:mt-12 lg:flex-col lg:items-stretch lg:gap-0 lg:overflow-visible lg:pb-0">
+                {services.map((s, i) => (
+                  <TabsTrigger key={s.title} value={String(i)} className="group shrink-0 justify-start gap-4 rounded-full border border-primary/20 bg-card px-4 py-2.5 text-left text-[0.95rem] font-semibold text-primary data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none lg:whitespace-normal lg:rounded-none lg:border-0 lg:border-t lg:border-primary/15 lg:bg-transparent lg:px-0 lg:py-5 lg:font-display lg:text-[1.55rem] lg:font-bold lg:leading-tight lg:text-primary/75 lg:hover:text-primary lg:data-[state=active]:bg-transparent lg:data-[state=active]:text-primary">
+                    <span className="hidden w-10 font-sans text-sm font-semibold text-primary lg:inline">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="min-w-0 flex-1">{s.title}</span>
+                    <ArrowRight className="hidden h-6 w-6 shrink-0 -translate-x-2 opacity-0 transition-all group-data-[state=active]:translate-x-0 group-data-[state=active]:opacity-100 lg:block" />
+                  </TabsTrigger>
+                ))}
+              </TabsList>
             </div>
-            <div className="mt-14 grid gap-8 md:grid-cols-3">
-              {services.map((s) => (
-                <article key={s.title} className="service-item group flex min-w-0 flex-col">
-                  <div className="overflow-hidden rounded-md">
-                    <img src={s.img} alt={s.title} loading="lazy" width={1024} height={768} className={`aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-105 ${s.imgPosition ?? ""}`} />
+            {services.map((s, i) => (
+              <TabsContent key={s.title} value={String(i)} className="mt-0 min-w-0 animate-rise lg:col-span-7">
+                <article className="overflow-hidden rounded-[2rem] bg-card">
+                  <div className="relative">
+                    <img src={s.img} alt={s.alt} loading="lazy" width={1400} height={933} className="aspect-[16/11] w-full object-cover" />
+                    <span className="absolute left-5 top-5 grid h-14 w-14 place-items-center rounded-full bg-highlight font-display text-lg font-extrabold text-highlight-foreground">{String(i + 1).padStart(2, "0")}</span>
+                    <HalfDisc className="absolute -bottom-px right-8 w-28 text-card sm:w-40" />
                   </div>
-                  <div className="flex flex-1 flex-col pt-6">
-                    <h3 className="text-xl font-semibold leading-snug">{s.title}</h3>
-                    <p className="mt-3 text-base leading-relaxed text-muted-foreground">{s.desc}</p>
-                    <ul className="mt-5 space-y-2.5">
-                      {s.items.map((i) => (
-                        <li key={i} className="flex gap-3 text-[0.98rem]">
-                          <Check className="mt-1 h-4 w-4 shrink-0 text-accent" /> {i}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="mt-auto pt-7">
-                      <InformationButton service={s.service} variant="link" />
+                  <div className="grid gap-8 p-6 sm:p-10 md:grid-cols-[1.1fr_0.9fr]">
+                    <div>
+                      <h3 className="text-[1.7rem] leading-tight sm:text-3xl">{s.title}</h3>
+                      <p className="mt-4 leading-relaxed text-muted-foreground">{s.desc}</p>
+                    </div>
+                    <div className="flex flex-col">
+                      <ul className="space-y-3">
+                        {s.items.map((item) => (
+                          <li key={item} className="flex gap-3 text-[0.97rem]"><Dot className="mt-[0.55rem] h-1.5 w-1.5 bg-primary" />{item}</li>
+                        ))}
+                      </ul>
+                      <div className="mt-auto pt-8"><InformationButton service={s.service} /></div>
                     </div>
                   </div>
                 </article>
-              ))}
+              </TabsContent>
+            ))}
+          </Tabs>
+        </section>
+
+        {/* About, LIFE ON YOUR TERMS: a mosaic of photos and brand modules. */}
+        <section id="sobre" className="scroll-mt-20 py-20 md:py-28">
+          <div className="frame">
+            <div data-reveal className="grid gap-8 lg:grid-cols-12 lg:items-end">
+              <div className="lg:col-span-7">
+                <Eyebrow>Sobre Norita</Eyebrow>
+                <h2 className="mt-5 text-[2.2rem] leading-[1.04] sm:text-5xl lg:text-[3.6rem]">Cuidarlos también es darles espacio para seguir disfrutando de la vida.</h2>
+              </div>
+              <p className="text-lg leading-relaxed text-muted-foreground lg:col-span-4 lg:col-start-9">
+                Creemos que el cuidado de los adultos mayores debe ir más allá de resolver necesidades. También debe promover sus intereses, su autonomía, sus relaciones y esos pequeños momentos que hacen bien.
+              </p>
             </div>
+            <div className="mt-14 grid auto-rows-[10.5rem] grid-cols-2 gap-3 sm:auto-rows-[14rem] sm:gap-4 lg:auto-rows-[15.5rem] lg:grid-cols-4">
+              <img data-reveal src={couple} alt="Pareja de adultos mayores caminando por la ciudad y riendo" loading="lazy" className="col-span-2 row-span-2 h-full w-full rounded-[1.75rem] object-cover" />
+              <div data-reveal style={delay(100)} className="relative overflow-hidden rounded-[1.75rem] bg-highlight">
+                <ArcShape className="absolute -bottom-2 -right-2 w-[70%] text-primary" />
+                <Dot className="absolute left-5 top-5 h-8 w-8 bg-background sm:h-10 sm:w-10" />
+              </div>
+              <img data-reveal style={delay(200)} src={style} alt="Hombre mayor con estilo, de brazos cruzados frente a una pared de azulejos" loading="lazy" className="row-span-2 h-full w-full rounded-[1.75rem] object-cover object-top" />
+              <div data-reveal style={delay(150)} className="on-dark col-span-1 flex flex-col justify-end rounded-[1.75rem] bg-primary p-5 text-primary-foreground sm:p-7">
+                <p className="font-display text-lg font-bold leading-tight sm:text-2xl">Cuidar con respeto. Acompañar con cariño. <span className="text-highlight">Promover una vida activa.</span></p>
+              </div>
+              <img data-reveal src={drive} alt="Mujer mayor con gafas de sol conduciendo un descapotable" loading="lazy" className="col-span-2 h-full w-full rounded-[1.75rem] object-cover lg:col-span-2" />
+              <img data-reveal style={delay(100)} src={bike} alt="Mujer mayor paseando con su bicicleta por un parque" loading="lazy" className="col-span-1 h-full w-full rounded-[1.75rem] object-cover" />
+              <div data-reveal style={delay(200)} aria-hidden="true" className="flex items-center justify-center rounded-[1.75rem] bg-background ring-1 ring-inset ring-border">
+                <ModuleGrid tiles={[["blue", "warm"], ["soft", "none"], ["yellow", "none"], ["blue", "none"]]} columns={2} className="w-24 sm:w-32" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Care model, part 1: CARE, REIMAGINED. Rows instead of cards. */}
+        <section className="on-dark relative overflow-hidden bg-primary py-20 text-primary-foreground md:py-28">
+          <Dot className="absolute -right-40 -top-40 h-[26rem] w-[26rem] bg-primary-foreground/[0.06] md:h-[40rem] md:w-[40rem]" />
+          <div className="frame relative">
+            <div data-reveal>
+              <Eyebrow dark>Nuestra forma de acompañar</Eyebrow>
+              <h2 className="mt-6 max-w-4xl text-[2.2rem] leading-[1.04] sm:text-5xl lg:text-6xl">No se trata solo de acompañar. <span className="text-highlight">Se trata de hacerlo bien.</span></h2>
+            </div>
+            <ul className="mt-14 border-b border-primary-foreground/20">
+              {pillars.map(({ shape, t, d }, i) => (
+                <li key={t} data-reveal style={delay(i * 80)} className="group grid grid-cols-[3rem_1fr] items-center gap-x-5 gap-y-2 border-t border-primary-foreground/20 py-7 transition-colors sm:grid-cols-[4rem_1fr_auto] md:grid-cols-[5rem_1fr_1.2fr_auto] md:gap-x-10 md:py-9">
+                  <span className="font-display text-sm font-bold text-primary-foreground/60 md:text-base">{String(i + 1).padStart(2, "0")}</span>
+                  <h3 className="text-2xl transition-colors group-hover:text-highlight md:text-[2rem]">{t}</h3>
+                  <p className="col-start-2 leading-relaxed text-primary-foreground/80 md:col-start-3 md:row-start-1">{d}</p>
+                  <span className="hidden h-12 items-end transition-transform duration-500 group-hover:rotate-12 sm:col-start-3 sm:row-span-2 sm:row-start-1 sm:flex md:col-start-4 md:row-span-1">{shape}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* Care model, part 2: three steps on a connected path. */}
+        <section id="como-funciona" className="scroll-mt-20 py-20 md:py-28">
+          <div className="frame grid gap-12 lg:grid-cols-12">
+            <div className="lg:sticky lg:top-28 lg:col-span-5 lg:self-start">
+              <Eyebrow>Cómo funciona</Eyebrow>
+              <h2 className="mt-5 text-[2.2rem] leading-[1.04] sm:text-5xl lg:text-6xl">Empezar a cuidar mejor es sencillo.</h2>
+              <div className="mt-10 hidden lg:block"><RequestInfoButton /></div>
+            </div>
+            <ol className="relative lg:col-span-6 lg:col-start-7">
+              <span aria-hidden="true" className="absolute bottom-24 left-7 top-10 w-px bg-primary/20" />
+              {steps.map(([n, t, d], i) => (
+                <li key={n} data-reveal style={delay(i * 120)} className="relative grid grid-cols-[3.5rem_1fr] gap-6 pb-12 last:pb-0">
+                  <span className={`relative grid h-14 w-14 place-items-center rounded-full font-display text-lg font-extrabold ${i === 0 ? "bg-highlight text-highlight-foreground" : i === 1 ? "bg-secondary text-primary ring-8 ring-background" : "bg-primary text-primary-foreground"}`}>{n}</span>
+                  <div className="pt-2">
+                    <h3 className="text-[1.6rem] leading-tight sm:text-[1.9rem]">{t}</h3>
+                    <p className="mt-3 max-w-md text-lg leading-relaxed text-muted-foreground">{d}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <div className="lg:hidden"><RequestInfoButton /></div>
           </div>
         </section>
 
         <NoritaAppSection />
 
-        {/* Experiencia */}
-        <section className="bg-primary py-20 text-primary-foreground md:py-28">
-          <div className="mx-auto max-w-7xl px-5 md:px-8">
-            <h2 className="max-w-3xl text-3xl font-medium leading-tight text-primary-foreground md:text-4xl">No se trata solo de acompañar.<br />Se trata de hacerlo bien.</h2>
-            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {pillars.map(({ icon: Icon, t, d }) => (
-                <div key={t} className="care-pillar border-t border-primary-foreground/25 pt-7">
-                  <Icon className="h-7 w-7 text-sage" strokeWidth={1.5} />
-                  <h3 className="mt-6 text-xl font-bold text-primary-foreground">{t}</h3>
-                  <p className="mt-2 leading-relaxed text-primary-foreground/75">{d}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Cómo funciona */}
-        <section id="como-funciona" className="scroll-mt-20 py-20 md:py-28">
-          <div className="mx-auto max-w-7xl px-5 md:px-8">
-            <p className="text-sm font-semibold uppercase tracking-widest text-accent">Cómo funciona</p>
-            <h2 className="mt-3 text-3xl font-bold leading-tight md:text-5xl">Empezar a cuidar mejor es sencillo.</h2>
-            <div className="mt-14 grid gap-10 md:grid-cols-3">
-              {steps.map(([n, t, d]) => (
-                <div key={n} className="care-step border-t-2 border-sage pt-6">
-                  <span className="font-display text-5xl font-bold text-sage">{n}</span>
-                  <div className="min-w-0"><h3 className="mt-4 text-2xl font-bold">{t}</h3>
-                  <p className="mt-3 leading-relaxed text-muted-foreground">{d}</p></div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-14"><RequestInfoButton /></div>
-          </div>
-        </section>
-
-        {/* Sobre */}
-        <section id="sobre" className="scroll-mt-20 bg-secondary/60 py-20 md:py-24">
-          <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 md:grid-cols-2 md:px-8">
-            <div className="md:order-2">
-              <img src={vida} alt="Adulta mayor plantando flores junto a su nieta" loading="lazy" width={1280} height={960} className="aspect-[4/3] w-full rounded-md object-cover" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-widest text-accent">Sobre Norita</p>
-              <h2 className="mt-3 text-3xl font-bold leading-tight md:text-5xl">Cuidarlos también es darles espacio para seguir disfrutando de la vida.</h2>
-              <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-                Creemos que el cuidado de los adultos mayores debe ir más allá de resolver necesidades. También debe promover sus intereses, su autonomía, sus relaciones y esos pequeños momentos que hacen bien.
-              </p>
-              <p className="mt-6 font-display text-xl font-semibold text-primary">Cuidar con respeto. Acompañar con cariño. Promover una vida activa.</p>
-            </div>
-          </div>
-        </section>
-
         {/* FAQ */}
-        <section className="py-20 md:py-28">
-          <div className="mx-auto max-w-3xl px-5 md:px-8">
-            <h2 className="text-3xl font-bold leading-tight md:text-5xl">Preguntas frecuentes</h2>
-            <Accordion type="single" collapsible className="mt-10">
-              {faqs.map(([q, a], i) => (
-                <AccordionItem key={q} value={`f${i}`} className="border-border">
-                  <AccordionTrigger className="min-h-14 gap-4 py-5 text-left text-base font-medium hover:no-underline sm:py-6 sm:text-lg sm:font-semibold">{q}</AccordionTrigger>
-                  <AccordionContent className="pb-6 text-base leading-relaxed text-muted-foreground">{a}</AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-            <div className="mt-8"><RequestInfoButton className={btnGhost} /></div>
+        <section id="preguntas" className="scroll-mt-20 py-20 md:py-28">
+          <div className="frame grid gap-10 lg:grid-cols-12">
+            <div className="lg:sticky lg:top-28 lg:col-span-4 lg:self-start">
+              <Eyebrow>Preguntas frecuentes</Eyebrow>
+              <h2 className="mt-5 text-[2.2rem] leading-[1.04] sm:text-5xl">Lo que suelen preguntarnos.</h2>
+              <div className="mt-8 hidden lg:block"><RequestInfoButton variant="outline" /></div>
+            </div>
+            <div className="lg:col-span-7 lg:col-start-6">
+              <Accordion type="single" collapsible className="border-t border-primary/15">
+                {faqs.map(([q, a], i) => (
+                  <AccordionItem key={q} value={`f${i}`} className="border-b border-primary/15">
+                    <AccordionTrigger className="min-h-16 gap-4 py-6 text-left font-display text-lg font-bold text-primary hover:no-underline sm:text-xl">{q}</AccordionTrigger>
+                    <AccordionContent className="pb-7 pr-8 text-base leading-relaxed text-muted-foreground">{a}</AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+              <div className="mt-8 lg:hidden"><RequestInfoButton variant="outline" /></div>
+            </div>
           </div>
         </section>
 
-        {/* CTA final */}
-        <section id="contacto" className="scroll-mt-20 bg-secondary px-5 py-16 md:px-8 md:py-20">
-          <div className="mx-auto max-w-3xl text-center">
-            <div>
-              <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-accent">Conversemos</p>
-              <h2 className="text-3xl font-medium leading-tight md:text-4xl">Tus padres merecen sentirse acompañados. Tú mereces estar tranquilo.</h2>
-              <p className="mt-6 text-lg leading-relaxed text-foreground/80">Cuéntanos qué necesita tu familia y encontremos juntos la mejor forma de acompañarlos.</p>
-              <div className="mt-9"><RequestInfoButton /></div>
-              <div className="mt-5"><ScheduleCall /></div>
-              <p className="mt-4 text-sm text-foreground/70">Estamos aquí para escucharte.</p>
+        {/* Final CTA: full-bleed yellow, photo in an arch. */}
+        <section id="contacto" className="scroll-mt-20 overflow-hidden bg-highlight text-highlight-foreground">
+          <div className="frame grid items-end gap-10 pt-16 sm:pt-20 lg:grid-cols-12 lg:gap-8 lg:pt-24">
+            <div className="min-w-0 pb-4 lg:col-span-7 lg:pb-24">
+              <Eyebrow dot="bg-primary">Conversemos</Eyebrow>
+              <h2 data-reveal className="mt-5 text-[2.3rem] leading-[1.02] tracking-[-0.04em] sm:text-6xl lg:text-[4.2rem]">Tus padres merecen sentirse acompañados. Tú mereces estar tranquilo.</h2>
+              <p className="mt-6 max-w-xl text-lg leading-relaxed">Cuéntanos qué necesita tu familia y encontremos juntos la mejor forma de acompañarlos.</p>
+              <div className="mt-9 flex flex-col items-start gap-4">
+                <RequestInfoButton />
+                <ScheduleCall />
+              </div>
+            </div>
+            <div className="relative mx-auto w-full max-w-sm lg:col-span-5 lg:max-w-none">
+              <img src={laugh} alt="Mujer mayor con gafas riendo con las manos en las mejillas" loading="lazy" width={1400} height={932} className="relative aspect-[4/5] w-full rounded-t-full object-cover object-[40%_50%]" />
+              <Dot className="absolute right-2 top-6 h-20 w-20 bg-primary sm:h-24 sm:w-24" />
             </div>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-background">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 md:grid-cols-3 md:px-8">
-          <div>
-            <Logo />
-            <p className="mt-4 max-w-xs text-muted-foreground">Acompañamiento y bienestar para adultos mayores en {BRAND.coverage.split(",")[0]}.</p>
-          </div>
-          <div>
-            <h3 className="text-base font-semibold">Servicios</h3>
-            <ul className="mt-4 space-y-2 text-muted-foreground">
-              {services.map((s) => <li key={s.title}><a href="#servicios" className="hover:text-primary">{s.title}</a></li>)}
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-base font-semibold">Contacto</h3>
-            <div className="mt-4 space-y-3 text-muted-foreground">
-              <Link to="/contacto" className="flex items-center gap-2 font-medium text-primary hover:underline">Solicitar información <ArrowRight className="h-4 w-4" /></Link>
-              {BRAND.email && <a href={`mailto:${BRAND.email}`} className="block hover:text-primary">{BRAND.email}</a>}
-              <a href="/privacidad" className="block text-sm hover:text-primary">Política de privacidad</a>
-            </div>
-          </div>
-        </div>
-        <p className="border-t border-border py-6 text-center text-sm text-muted-foreground">© {new Date().getFullYear()} Norita · {BRAND.coverage}</p>
-      </footer>
-
+      <SiteFooter />
     </div>
   );
 }

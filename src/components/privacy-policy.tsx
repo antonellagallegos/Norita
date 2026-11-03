@@ -13,7 +13,7 @@ const draft = pendingPolicyFields().length > 0;
 
 function Pending({ children }: { children: ReactNode }) {
   return (
-    <mark className="rounded-sm border border-dashed border-accent bg-secondary px-1 text-foreground">
+    <mark className="rounded-md border border-dashed border-foreground/30 bg-highlight/40 px-1.5 text-foreground">
       [Pendiente: {children}]
     </mark>
   );
@@ -23,7 +23,7 @@ const value = (v: string | null, label: string) => v ?? <Pending>{label}</Pendin
 function LegalNote({ topic }: { topic: LegalReviewKey }) {
   if (policy.legalReviewed) return null;
   return (
-    <p className="border-l-2 border-accent bg-secondary px-4 py-3 text-sm leading-relaxed text-foreground">
+    <p className="rounded-2xl border-l-4 border-highlight bg-secondary px-5 py-4 text-sm leading-relaxed text-foreground">
       <strong>Validación legal:</strong> {LEGAL_REVIEW[topic]}
     </p>
   );
@@ -34,9 +34,9 @@ function Section({ id, title, children }: { id: string; title: string; children:
     <section
       id={id}
       aria-labelledby={`${id}-title`}
-      className="scroll-mt-8 border-t border-border pt-10"
+      className="scroll-mt-28 border-t border-border pt-10"
     >
-      <h2 id={`${id}-title`} className="text-2xl font-medium leading-tight">
+      <h2 id={`${id}-title`} className="text-[1.6rem] font-bold leading-tight sm:text-3xl">
         {title}
       </h2>
       <div className="mt-5 space-y-4 leading-relaxed text-foreground/85">{children}</div>
@@ -49,7 +49,7 @@ const Subheading = ({ children }: { children: ReactNode }) => (
 );
 
 const List = ({ items }: { items: ReactNode[] }) => (
-  <ul className="list-disc space-y-2 pl-5 marker:text-accent">
+  <ul className="list-disc space-y-2 pl-5 marker:text-primary">
     {items.map((item, i) => (
       <li key={i}>{item}</li>
     ))}
@@ -58,11 +58,11 @@ const List = ({ items }: { items: ReactNode[] }) => (
 
 function Facts({ rows }: { rows: [ReactNode, ReactNode][] }) {
   return (
-    <dl className="divide-y divide-border border-y border-border">
+    <dl className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
       {rows.map(([term, detail], i) => (
         <div
           key={i}
-          className="grid gap-1 py-3 sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] sm:gap-4"
+          className="grid gap-1 px-5 py-4 sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] sm:gap-4"
         >
           <dt className="font-medium text-primary">{term}</dt>
           <dd className="min-w-0 break-words">{detail}</dd>
@@ -133,17 +133,18 @@ export function PrivacyPolicy() {
   return (
     <article className="space-y-10">
       <header>
-        <p className="text-sm font-semibold uppercase text-accent">Norita · Privacidad</p>
-        <h1 className="mt-3 text-3xl font-medium leading-tight md:text-4xl">
-          Política de privacidad
-        </h1>
+        <p className="eyebrow text-primary">
+          <span aria-hidden="true" className="h-2 w-2 rounded-full bg-highlight" />
+          Norita · Privacidad
+        </p>
+        <h1 className="mt-5 text-[2.4rem] leading-[1.05] sm:text-6xl">Política de privacidad</h1>
         <p className="mt-4 text-sm text-muted-foreground">
           Versión {policy.version} · Última actualización: {policy.updatedAt}
         </p>
         {draft && (
           <div
             role="status"
-            className="mt-6 border-l-2 border-accent bg-secondary px-4 py-3 text-sm leading-relaxed"
+            className="mt-8 rounded-2xl border-l-4 border-highlight bg-secondary px-5 py-4 text-sm leading-relaxed"
           >
             <p className="font-semibold text-primary">Borrador pendiente de aprobación</p>
             <p className="mt-1">
@@ -169,8 +170,8 @@ export function PrivacyPolicy() {
         </div>
       </header>
 
-      <nav aria-label="Contenido de la política" className="bg-secondary/60 px-5 py-5">
-        <p className="text-sm font-semibold text-primary">Contenido</p>
+      <nav aria-label="Contenido de la política" className="rounded-[1.5rem] bg-card p-6 sm:p-7">
+        <p className="font-display text-lg font-bold text-primary">Contenido</p>
         <ol className="mt-3 grid list-decimal gap-x-8 gap-y-1.5 pl-5 text-sm sm:grid-cols-2">
           {POLICY_SECTIONS.map(([id, title]) => (
             <li key={id}>
@@ -449,9 +450,9 @@ export function PrivacyPolicy() {
           Para que el sitio funcione usamos proveedores que tratan datos por cuenta de Norita, según
           nuestras instrucciones y sus condiciones de servicio:
         </p>
-        <div className="divide-y divide-border border-y border-border">
+        <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
           {providers.map((p) => (
-            <div key={p.name} className="space-y-1 py-4">
+            <div key={p.name} className="space-y-1 px-5 py-4">
               <h3 className="font-semibold text-primary">{p.name}</h3>
               <p>{p.role}</p>
               <p className="text-sm text-muted-foreground">
