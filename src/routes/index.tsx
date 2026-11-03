@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import type { CSSProperties, ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArcShape, DiagonalShape, Dot, HalfDisc, ModuleGrid, useScrollReveal } from "@/components/brand";
+import { ArcShape, delay, DiagonalShape, Dot, Eyebrow, HalfDisc, ModuleGrid, Pill, useScrollReveal } from "@/components/brand";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { NoritaAppSection } from "@/components/norita-app-section";
 import { InformationButton, ScheduleCall } from "@/components/contact-options";
@@ -47,10 +46,6 @@ function RequestInfoButton({ variant = "default" }: { variant?: "default" | "out
       Solicitar información <ArrowRight />
     </Link></Button>
   );
-}
-
-function Eyebrow({ children, dark = false, dot = "bg-highlight" }: { children: ReactNode; dark?: boolean; dot?: string }) {
-  return <p className={`eyebrow ${dark ? "text-primary-foreground/80" : "text-primary"}`}><Dot className={`h-2 w-2 ${dot}`} />{children}</p>;
 }
 
 const services = [
@@ -106,14 +101,6 @@ const faqs = [
 ];
 
 const trust = ["Cuidado humano y respetuoso", "Atención personalizada", "Comunicación con la familia"];
-
-// Staggers the scroll reveal of sibling elements.
-const delay = (ms: number) => ({ "--reveal-delay": `${ms}ms` }) as CSSProperties;
-
-// Small photo set inline in a headline, as in editorial layouts.
-function Pill({ src, className = "" }: { src: string; className?: string }) {
-  return <img src={src} alt="" aria-hidden="true" loading="lazy" className={`mx-[0.08em] inline-block h-[0.82em] w-[1.7em] -translate-y-[0.06em] rounded-full object-cover align-middle ${className}`} />;
-}
 
 function Index() {
   useScrollReveal();

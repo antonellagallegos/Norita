@@ -16,3 +16,10 @@ Fotos de [Pexels](https://www.pexels.com/license/) (uso comercial gratuito, sin 
 | care-strength.jpg | https://www.pexels.com/photo/elderly-woman-dancing-12086689/ |
 | care-weekend.jpg | https://www.pexels.com/photo/cheerful-senior-mother-and-adult-daughter-using-smartphone-together-3791664/ |
 | family-together.jpg | https://www.pexels.com/photo/close-up-photo-of-mother-and-daughter-smiling-8829191/ |
+| cg-hero.jpg | https://www.pexels.com/photo/a-woman-helping-a-man-in-doing-exercise-7551622/ |
+| cg-support.jpg | https://www.pexels.com/photo/a-woman-in-yellow-cardigan-holding-the-man-s-arm-7551661/ |
+| cg-care.jpg | https://www.pexels.com/photo/woman-assisting-elderly-man-7551667/ |
+| cg-movement.jpg | https://www.pexels.com/photo/a-man-in-blue-sweater-wearing-eyeglasses-doing-exercise-7551627/ |
+| cg-team.jpg | https://www.pexels.com/photo/women-putting-their-hands-together-8837438/ |
+| cg-training.jpg | https://www.pexels.com/photo/diverse-group-in-an-engaging-indoor-workshop-33714873/ |
+| cg-bond.jpg | https://www.pexels.com/photo/elderly-women-looking-outside-together-6919285/ |

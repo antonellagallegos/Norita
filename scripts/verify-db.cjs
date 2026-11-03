@@ -44,11 +44,11 @@ const journal = JSON.parse(fs.readFileSync(path.join(MIGRATIONS, "meta/_journal.
   hash: createHash("sha256").update(fs.readFileSync(path.join(MIGRATIONS, `${e.tag}.sql`), "utf8")).digest("hex"),
 }));
 const EXPECTED = {
-  tables: ["integration_jobs", "lead_audit_log", "lead_submission_attempts", "leads", "user_roles"],
+  tables: ["caregiver_applications", "integration_jobs", "lead_audit_log", "lead_submission_attempts", "leads", "user_roles"],
   functions: ["audit_lead_update", "claim_integration_jobs", "enqueue_lead_jobs", "inherit_commercial_opt_out", "is_lead_admin", "lead_metrics", "log_lead_list", "record_commercial_opt_out", "record_first_lead_contact", "register_lead_attempt"],
   policies: ["integration_jobs.admin_read.SELECT", "lead_audit_log.admin_read.SELECT", "leads.admin_read.SELECT", "leads.admin_update.UPDATE", "user_roles.own_role_read.SELECT"],
   triggers: ["audit_lead_update", "enqueue_lead_jobs", "inherit_commercial_opt_out", "preserve_first_contact"],
-  indexes: ["integration_jobs_due_idx", "lead_audit_log_created_idx", "lead_submission_attempts_client_idx", "lead_submission_attempts_created_idx", "leads_created_idx", "leads_follow_up_idx", "leads_phone_idx", "leads_status_idx"],
+  indexes: ["caregiver_applications_created_idx", "caregiver_applications_phone_idx", "integration_jobs_due_idx", "lead_audit_log_created_idx", "lead_submission_attempts_client_idx", "lead_submission_attempts_created_idx", "leads_created_idx", "leads_follow_up_idx", "leads_phone_idx", "leads_status_idx"],
   leadUpdateColumns: ["commercial_opt_out_at", "commercial_opt_out_source", "internal_notes", "last_contact_at", "next_follow_up_at", "status"],
 };
 const PRIVS = ["SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "REFERENCES", "TRIGGER"];
@@ -96,7 +96,7 @@ async function structure() {
     check(`historial de Drizzle con ${journal.length} migraciones (todas las del índice)`, applied.length === journal.length, { applied: applied.length });
     journal.forEach((e, i) => check(`  ${e.tag.slice(0, 4)}: huella ${e.hash.slice(0, 8)}… y fecha coinciden con el archivo`, applied[i]?.hash === e.hash && applied[i]?.created_at === e.when));
     const tables = await tx`select tablename, rowsecurity from pg_tables where schemaname = 'public'`;
-    check(`5 tablas: ${EXPECTED.tables.join(", ")}`, same(tables.map((t) => t.tablename), EXPECTED.tables), tables.map((t) => t.tablename));
+    check(`${EXPECTED.tables.length} tablas: ${EXPECTED.tables.join(", ")}`, same(tables.map((t) => t.tablename), EXPECTED.tables), tables.map((t) => t.tablename));
     check("RLS activado en todas las tablas", tables.every((t) => t.rowsecurity));
     const fns = await tx`select p.proname from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public'`;
     check("10 funciones esperadas", same(fns.map((f) => f.proname), EXPECTED.functions), fns.map((f) => f.proname));
@@ -105,7 +105,7 @@ async function structure() {
     const trg = await tx`select tgname from pg_trigger where tgrelid = 'public.leads'::regclass and not tgisinternal`;
     check("4 triggers en leads", same(trg.map((t) => t.tgname), EXPECTED.triggers), trg.map((t) => t.tgname));
     const idx = await tx`select indexname from pg_indexes where schemaname = 'public' and indexname not like '%pkey' and indexname not like '%\\_key' escape '\\'`;
-    check("8 índices esperados", same(idx.map((i) => i.indexname), EXPECTED.indexes), idx.map((i) => i.indexname));
+    check(`${EXPECTED.indexes.length} índices esperados`, same(idx.map((i) => i.indexname), EXPECTED.indexes), idx.map((i) => i.indexname));
     const [aal] = await tx`select pg_get_functiondef('public.is_lead_admin'::regproc) like '%aal2%' ok`;
     check("is_lead_admin exige segundo factor (aal2)", aal.ok);
     const anonFns = await tx`select p.proname from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and has_function_privilege('anon', p.oid, 'EXECUTE')`;
@@ -129,6 +129,8 @@ async function effectivePrivileges() {
     const [c] = await tx`select has_any_column_privilege('authenticated', 'public.leads', 'INSERT') li, has_any_column_privilege('authenticated', 'public.leads', 'REFERENCES') lr,
       has_any_column_privilege('authenticated', 'public.user_roles', 'UPDATE') ru, has_any_column_privilege('authenticated', 'public.user_roles', 'INSERT') ri`;
     check("sin INSERT/REFERENCES por columna en leads ni INSERT/UPDATE por columna en user_roles", !c.li && !c.lr && !c.ru && !c.ri, c);
+    const applications = await has("authenticated", "caregiver_applications");
+    check("caregiver_applications: authenticated sin ningún permiso (solo el servidor escribe)", applications === "ninguno", applications);
     const roles = await has("authenticated", "user_roles");
     check("user_roles: authenticated solo SELECT", roles === "SELECT", roles);
     for (const t of EXPECTED.tables) { const p = await has("anon", t); check(`anon sin ningún permiso en ${t}`, p === "ninguno", p); }

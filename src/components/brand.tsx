@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, type CSSProperties, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 // Provisional wordmark: the name set in Manrope ExtraBold. It deliberately does not redraw the
@@ -127,3 +127,37 @@ export function useScrollReveal() {
     };
   }, []);
 }
+
+/** Section label: uppercase Inter with the brand's focal circle. */
+export function Eyebrow({
+  children,
+  dark = false,
+  dot = "bg-highlight",
+}: {
+  children: ReactNode;
+  dark?: boolean;
+  dot?: string;
+}) {
+  return (
+    <p className={`eyebrow ${dark ? "text-primary-foreground/80" : "text-primary"}`}>
+      <Dot className={`h-2 w-2 ${dot}`} />
+      {children}
+    </p>
+  );
+}
+
+/** Small photo set inline in a headline, as in editorial layouts. Decorative. */
+export function Pill({ src, className = "" }: { src: string; className?: string }) {
+  return (
+    <img
+      src={src}
+      alt=""
+      aria-hidden="true"
+      loading="lazy"
+      className={`mx-[0.08em] inline-block h-[0.82em] w-[1.7em] -translate-y-[0.06em] rounded-full object-cover align-middle ${className}`}
+    />
+  );
+}
+
+/** Staggers the scroll reveal of sibling elements. */
+export const delay = (ms: number) => ({ "--reveal-delay": `${ms}ms` }) as CSSProperties;

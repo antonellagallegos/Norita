@@ -14,6 +14,92 @@ export type Database = {
   }
   public: {
     Tables: {
+      caregiver_applications: {
+        Row: {
+          adult_confirmed: boolean
+          availability_days: string[]
+          availability_slots: string[]
+          city: string
+          consent_processing: boolean
+          consent_talent_pool: boolean
+          country: string
+          created_at: string
+          district: string
+          duplicate_of: string | null
+          experience_types: string[]
+          experience_years: string
+          id: string
+          name: string
+          phone: string
+          privacy_version: string
+          processing_timestamp: string
+          services: string[]
+          source: string
+          status: string
+          submission_id: string
+          talent_pool_timestamp: string | null
+          training: string[]
+        }
+        Insert: {
+          adult_confirmed: boolean
+          availability_days: string[]
+          availability_slots: string[]
+          city: string
+          consent_processing: boolean
+          consent_talent_pool?: boolean
+          country: string
+          created_at?: string
+          district: string
+          duplicate_of?: string | null
+          experience_types?: string[]
+          experience_years: string
+          id?: string
+          name: string
+          phone: string
+          privacy_version: string
+          processing_timestamp?: string
+          services: string[]
+          source?: string
+          status?: string
+          submission_id: string
+          talent_pool_timestamp?: string | null
+          training: string[]
+        }
+        Update: {
+          adult_confirmed?: boolean
+          availability_days?: string[]
+          availability_slots?: string[]
+          city?: string
+          consent_processing?: boolean
+          consent_talent_pool?: boolean
+          country?: string
+          created_at?: string
+          district?: string
+          duplicate_of?: string | null
+          experience_types?: string[]
+          experience_years?: string
+          id?: string
+          name?: string
+          phone?: string
+          privacy_version?: string
+          processing_timestamp?: string
+          services?: string[]
+          source?: string
+          status?: string
+          submission_id?: string
+          talent_pool_timestamp?: string | null
+          training?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "caregiver_applications_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "caregiver_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       integration_jobs: {
         Row: {
           attempts: number

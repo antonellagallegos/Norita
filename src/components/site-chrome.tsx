@@ -6,17 +6,60 @@ import { BrandLogo, Dot } from "@/components/brand";
 import { BRAND } from "@/lib/brand";
 import { SERVICES } from "@/lib/leads";
 
-// Absolute anchors so the same header works on the home page and on inner pages.
-const NAV = [
-  ["Servicios", "/#servicios"],
-  ["Cómo funciona", "/#como-funciona"],
-  ["Nuestra app", "/#app"],
-  ["Sobre Norita", "/#sobre"],
-  ["Preguntas", "/#preguntas"],
-] as const;
+// Two separate funnels share the chrome: families (/) and caregivers (/cuidadores). Each has its own
+// menu and its own call to action, so neither page leads into the other's form.
+// Absolute anchors so the same header works on the landing and on inner pages.
+export type Audience = "families" | "caregivers";
+const NAV: Record<Audience, readonly (readonly [string, string])[]> = {
+  families: [
+    ["Servicios", "/#servicios"],
+    ["Cómo funciona", "/#como-funciona"],
+    ["Nuestra app", "/#app"],
+    ["Sobre Norita", "/#sobre"],
+    ["Preguntas", "/#preguntas"],
+  ],
+  caregivers: [
+    ["Beneficios", "/cuidadores#beneficios"],
+    ["Proceso", "/cuidadores#proceso"],
+    ["Formación", "/cuidadores#formacion"],
+    ["Preguntas", "/cuidadores#preguntas"],
+  ],
+};
+const CTA: Record<Audience, { label: string; to: string }> = {
+  families: { label: "Solicitar información", to: "/contacto" },
+  caregivers: { label: "Postular", to: "/cuidadores#postular" },
+};
 
-export function SiteHeader() {
+function AudienceSwitch({ audience, className = "" }: { audience: Audience; className?: string }) {
+  const item = (active: boolean) =>
+    `rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors ${active ? "bg-primary text-primary-foreground" : "text-primary hover:bg-secondary"}`;
+  return (
+    <nav
+      aria-label="Elige tu perfil"
+      className={`flex rounded-full border border-primary/20 bg-card p-1 ${className}`}
+    >
+      <Link
+        to="/"
+        aria-current={audience === "families" ? "page" : undefined}
+        className={item(audience === "families")}
+      >
+        Familias
+      </Link>
+      <Link
+        to="/cuidadores"
+        aria-current={audience === "caregivers" ? "page" : undefined}
+        className={item(audience === "caregivers")}
+      >
+        Cuidadores
+      </Link>
+    </nav>
+  );
+}
+
+export function SiteHeader({ audience = "families" }: { audience?: Audience }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const nav = NAV[audience];
+  const cta = CTA[audience];
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur-md">
       <div className="frame flex h-16 items-center justify-between gap-4 md:h-[4.5rem]">
@@ -27,8 +70,9 @@ export function SiteHeader() {
         >
           <BrandLogo />
         </Link>
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Navegación principal">
-          {NAV.map(([label, href]) => (
+        <AudienceSwitch audience={audience} className="hidden md:flex lg:mr-auto lg:ml-4" />
+        <nav className="hidden items-center gap-1 xl:flex" aria-label="Navegación principal">
+          {nav.map(([label, href]) => (
             <a
               key={href}
               href={href}
@@ -40,14 +84,14 @@ export function SiteHeader() {
         </nav>
         <div className="flex shrink-0 items-center gap-2">
           <Button asChild className="hidden sm:inline-flex">
-            <Link to="/contacto">
-              Solicitar información <ArrowRight />
-            </Link>
+            <a href={cta.to}>
+              {cta.label} <ArrowRight />
+            </a>
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="h-11 w-11 lg:hidden"
+            className="h-11 w-11 xl:hidden"
             aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={menuOpen}
             aria-controls="mobile-navigation"
@@ -61,10 +105,11 @@ export function SiteHeader() {
         <nav
           id="mobile-navigation"
           aria-label="Navegación móvil"
-          className="border-t border-border bg-background lg:hidden"
+          className="border-t border-border bg-background xl:hidden"
         >
-          <div className="frame pb-6 pt-2">
-            {NAV.map(([label, href]) => (
+          <div className="frame pb-6 pt-4">
+            <AudienceSwitch audience={audience} className="mb-2 w-fit md:hidden" />
+            {nav.map(([label, href]) => (
               <a
                 key={href}
                 href={href}
@@ -76,9 +121,9 @@ export function SiteHeader() {
               </a>
             ))}
             <Button asChild size="lg" className="mt-6 w-full sm:hidden">
-              <Link to="/contacto" onClick={() => setMenuOpen(false)}>
-                Solicitar información <ArrowRight />
-              </Link>
+              <a href={cta.to} onClick={() => setMenuOpen(false)}>
+                {cta.label} <ArrowRight />
+              </a>
             </Button>
           </div>
         </nav>
@@ -87,7 +132,8 @@ export function SiteHeader() {
   );
 }
 
-export function SiteFooter() {
+export function SiteFooter({ audience = "families" }: { audience?: Audience }) {
+  const cta = CTA[audience];
   return (
     <footer className="on-dark bg-ink text-ink-foreground">
       <div className="frame grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1fr] md:py-20">
@@ -118,17 +164,20 @@ export function SiteFooter() {
             Contacto
           </h2>
           <div className="mt-5 space-y-3 text-[0.95rem] text-ink-foreground/85">
-            <Link
-              to="/contacto"
+            <a
+              href={cta.to}
               className="flex items-center gap-2 font-semibold text-highlight hover:underline"
             >
-              Solicitar información <ArrowRight className="h-4 w-4" />
-            </Link>
+              {cta.label} <ArrowRight className="h-4 w-4" />
+            </a>
             {BRAND.email && (
               <a href={`mailto:${BRAND.email}`} className="block hover:text-highlight">
                 {BRAND.email}
               </a>
             )}
+            <Link to="/cuidadores" className="block hover:text-highlight">
+              Trabaja con Norita
+            </Link>
             <Link to="/privacidad" className="block hover:text-highlight">
               Política de privacidad
             </Link>
