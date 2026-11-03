@@ -45,13 +45,13 @@ export function CaregiverHero() {
         <div className="min-w-0 animate-rise lg:col-span-6">
           <Eyebrow dark>Trabaja con Norita · Lima y Bogotá</Eyebrow>
           <h1 className="mt-6 text-[3.1rem] leading-[0.98] tracking-[-0.045em] sm:text-7xl lg:text-[5.6rem]">
-            Tu vocación merece{" "}
+            Más oportunidades y una agenda{" "}
             <span className="relative isolate ml-[0.12em] inline-block text-highlight-foreground">
               <span
                 aria-hidden="true"
                 className="absolute inset-x-[-0.14em] bottom-[0.04em] top-[0.16em] -z-10 -rotate-2 rounded-full bg-highlight"
               />
-              más.
+              llena.
             </span>
           </h1>
           <p className="mt-8 max-w-md text-lg leading-relaxed text-primary-foreground/85">
